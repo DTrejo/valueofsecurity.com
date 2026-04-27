@@ -1,0 +1,15 @@
+{
+  "ticker": "CHYM",
+  "fiscalYear": 2025,
+  "sourceFile": "docs/chime/xbrl/chym-20251231.htm",
+  "extractedAt": "2026-04-27T19:14:13.087Z",
+  "metrics": {
+    "revenue": 2186770000,
+    "revenueGrowthPct": 30.688490613284536,
+    "grossMarginPct": 87.97098002990712,
+    "ebitdaMarginPct": -46.18588145987004,
+    "freeCashFlowMarginPct": 1.5041819670107053,
+    "netDebt": -434852000,
+    "employeeCount": null
+  }
+}

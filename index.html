@@ -1,42 +1,113 @@
 <!DOCTYPE html><html lang="en"><head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preact Hello</title>
-</head>
-<body>
-  <div id="app"><h1>Hello World!</h1></div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Value Metrics</title>
+  </head>
+  <body>
+    <!-- Server rendered by ./scripts/build.mjs -->
+    <div id="app"><main style="font-family:Arial, sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;"><h1>CHYM Metrics</h1><p>Fiscal Year 2025</p><table style="border-collapse:collapse;width:100%;"><thead><tr><th style="border-bottom:1px solid #ddd;text-align:left;padding:0.5rem 0;">Metric</th><th style="border-bottom:1px solid #ddd;text-align:right;padding:0.5rem 0;">Value</th></tr></thead><tbody><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Revenue</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">N/A</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Revenue Growth</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">N/A</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Gross Margin</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">N/A</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">EBITDA Margin</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">N/A</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Free Cash Flow Margin</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">N/A</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Net Debt</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">N/A</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Employee Count</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">N/A</td></tr></tbody></table></main></div>
 
-  <script type="importmap">
-    {
-      "imports": {
-        "preact": "https://esm.sh/preact",
-        "htm": "https://esm.sh/htm"
+    <script type="importmap">
+      {
+        "imports": {
+          "preact": "https://esm.sh/preact",
+          "preact/hooks": "https://esm.sh/preact/hooks",
+          "htm": "https://esm.sh/htm"
+        }
       }
-    }
-  </script>
+    </script>
 
-  <script type="module" id="app-module">
-    import { h, hydrate } from 'preact';
-    import htm from 'htm';
+    <script type="module" id="app-module">
+      import { h, hydrate } from 'preact'
+      import { useEffect, useState } from 'preact/hooks'
+      import htm from 'htm'
 
-    const html = htm.bind(h);
+      const html = htm.bind(h)
 
-    export function App(props) {
-      return html`
-        <h1>Hello ${props.name}!</h1>
-      `;
-    }
+      const orderedMetrics = [
+        ['revenue', 'Revenue'],
+        ['revenueGrowthPct', 'Revenue Growth'],
+        ['grossMarginPct', 'Gross Margin'],
+        ['ebitdaMarginPct', 'EBITDA Margin'],
+        ['freeCashFlowMarginPct', 'Free Cash Flow Margin'],
+        ['netDebt', 'Net Debt'],
+        ['employeeCount', 'Employee Count'],
+      ]
 
-    export const appProps = { name: 'World' };
+      const initialMetrics = {
+        revenue: null,
+        revenueGrowthPct: null,
+        grossMarginPct: null,
+        ebitdaMarginPct: null,
+        freeCashFlowMarginPct: null,
+        netDebt: null,
+        employeeCount: null,
+      }
 
-    export function renderApp() {
-      return html`<${App} name=${appProps.name} />`;
-    }
+      const currencyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+      const percentFormatter = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      const numberFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 
-    if (typeof document !== 'undefined') {
-      hydrate(renderApp(), document.getElementById('app'));
-    }
-  </script>
+      function formatValue(key, value) {
+        if (value === null || value === undefined) return 'N/A'
+        if (key === 'revenue' || key === 'netDebt') return currencyFormatter.format(value)
+        if (key.endsWith('Pct')) return `${percentFormatter.format(value)}%`
+        return numberFormatter.format(value)
+      }
+
+      export function App(props) {
+        const [metrics, setMetrics] = useState(props.metrics)
+        const [status, setStatus] = useState('loading')
+
+        useEffect(() => {
+          const metricsUrl = new URL('./company-metrics/chime.json', window.location.href)
+          fetch(metricsUrl)
+            .then((response) => {
+              if (!response.ok) throw new Error(`Failed to load metrics: ${response.status}`)
+              return response.json()
+            })
+            .then((payload) => {
+              setMetrics({ ...initialMetrics, ...(payload.metrics ?? {}) })
+              setStatus('ready')
+            })
+            .catch(() => setStatus('error'))
+        }, [])
+
+        return html`
+          <main style=${{ fontFamily: 'Arial, sans-serif', maxWidth: '720px', margin: '2rem auto', padding: '0 1rem' }}>
+            <h1>${props.ticker} Metrics</h1>
+            <p>Fiscal Year ${props.fiscalYear}</p>
+            ${status === 'error' && html`<p>Could not load company-metrics/chime.json</p>`}
+            <table style=${{ borderCollapse: 'collapse', width: '100%' }}>
+              <thead>
+                <tr>
+                  <th style=${{ borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem 0' }}>Metric</th>
+                  <th style=${{ borderBottom: '1px solid #ddd', textAlign: 'right', padding: '0.5rem 0' }}>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orderedMetrics.map(([key, label]) => html`
+                  <tr key=${key}>
+                    <td style=${{ borderBottom: '1px solid #f0f0f0', padding: '0.6rem 0' }}>${label}</td>
+                    <td style=${{ borderBottom: '1px solid #f0f0f0', padding: '0.6rem 0', textAlign: 'right' }}>${formatValue(key, metrics[key])}</td>
+                  </tr>
+                `)}
+              </tbody>
+            </table>
+          </main>
+        `
+      }
+
+      export const appProps = { ticker: 'CHYM', fiscalYear: 2025, metrics: initialMetrics }
+
+      export function renderApp() {
+        return html`<${App} ticker=${appProps.ticker} fiscalYear=${appProps.fiscalYear} metrics=${appProps.metrics} />`
+      }
+
+      if (typeof document !== 'undefined') {
+        hydrate(renderApp(), document.getElementById('app'))
+      }
+    </script>
 
 
 </body></html>
