@@ -70,6 +70,32 @@
 
       const companyPayload = await loadCompanyPayload()
 
+      function ThemePicker({ isLightTheme, onToggleTheme }) {
+        const lightOptionClass = isLightTheme
+          ? 'inline-flex h-7 w-7 items-center justify-center rounded-full transition bg-base-100 text-base-content shadow-sm ring-1 ring-base-content/15'
+          : 'inline-flex h-7 w-7 items-center justify-center rounded-full transition text-base-content/70'
+        const darkOptionClass = isLightTheme
+          ? 'inline-flex h-7 w-7 items-center justify-center rounded-full transition text-base-content/70'
+          : 'inline-flex h-7 w-7 items-center justify-center rounded-full transition bg-base-100 text-base-content shadow-sm ring-1 ring-base-content/15'
+
+        return html`
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 rounded-full border border-base-content/15 bg-base-300/70 p-1"
+            aria-label=${isLightTheme ? 'Switch to dark theme' : 'Switch to light theme'}
+            title=${isLightTheme ? 'Switch to dark theme' : 'Switch to light theme'}
+            onClick=${onToggleTheme}
+          >
+            <span class=${lightOptionClass}>
+              <i class="fa-solid fa-sun"></i>
+            </span>
+            <span class=${darkOptionClass}>
+              <i class="fa-solid fa-moon"></i>
+            </span>
+          </button>
+        `
+      }
+
       export function App({ company = {} }) {
         const ticker = company.ticker ?? 'N/A'
         const fiscalYear = company.fiscalYear ?? 'N/A'
@@ -92,28 +118,7 @@
                 <h1 class="text-3xl font-semibold">${ticker} Metrics</h1>
                 <p class="text-sm text-gray-600">Fiscal Year ${fiscalYear}</p>
               </div>
-              <button
-                type="button"
-                class="inline-flex items-center gap-1 rounded-full border border-base-content/15 bg-base-300/70 p-1"
-                aria-label=${isLightTheme ? 'Switch to dark theme' : 'Switch to light theme'}
-                title=${isLightTheme ? 'Switch to dark theme' : 'Switch to light theme'}
-                onClick=${toggleTheme}
-              >
-                <span class=${`inline-flex h-7 w-7 items-center justify-center rounded-full transition ${
-                  isLightTheme
-                    ? 'bg-base-100 text-base-content shadow-sm ring-1 ring-base-content/15'
-                    : 'text-base-content/70'
-                }`}>
-                  <i class="fa-solid fa-sun"></i>
-                </span>
-                <span class=${`inline-flex h-7 w-7 items-center justify-center rounded-full transition ${
-                  isLightTheme
-                    ? 'text-base-content/70'
-                    : 'bg-base-100 text-base-content shadow-sm ring-1 ring-base-content/15'
-                }`}>
-                  <i class="fa-solid fa-moon"></i>
-                </span>
-              </button>
+              <${ThemePicker} isLightTheme=${isLightTheme} onToggleTheme=${toggleTheme} />
             </div>
             <table class="w-full border-collapse">
               <thead>
