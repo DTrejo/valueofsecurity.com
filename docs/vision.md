@@ -23,5 +23,3 @@
 - Let’s say I want to create data presets for the site based on two companies: chime (10k form), and vercel (whatever we can figure out publicly).  
 -  1. Clearly lay out the data we need to collect  
 -  2. Create a set of examples ala engineerworth which flow from the data (plain text only for now)  
-  
-Feed of vulns and issues that we don’t need to worry about because of security team’s decisions. Like a “sleep soundly we’ve got the company covered” log. Possibly based on industry news, or vulns we already resolved or upgraded past.  
