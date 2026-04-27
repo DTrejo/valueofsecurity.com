@@ -1,1 +1,2 @@
 - When writing jsx/react/preact, never use `useEffect`
+- If something is unclear, check out readme.md or docs/
