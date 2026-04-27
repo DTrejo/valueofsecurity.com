@@ -6,8 +6,10 @@ import renderToString from 'preact-render-to-string';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const sourcePath = path.resolve(__dirname, '../src/index.html');
 const outputPath = path.resolve(__dirname, '../index.html');
-const indexSource = await readFile(outputPath, 'utf8');
+const indexSource = await readFile(sourcePath, 'utf8');
+const existingOutput = await readFile(outputPath, 'utf8').catch(() => null);
 const $ = load(indexSource);
 
 const appModuleElement = $('script#app-module[type="module"]').first();
@@ -40,7 +42,7 @@ const prerenderedApp = renderToString(appModule.renderApp());
 appElement.empty().append(prerenderedApp);
 const output = $.html();
 
-if (output !== indexSource) {
+if (output !== existingOutput) {
   await writeFile(outputPath, output, 'utf8');
   console.log(`Built ${outputPath}`);
 } else {
