@@ -5,7 +5,7 @@
     "watch:app": "node --watch-path index.html --watch-path scripts/build.mjs scripts/build.mjs",
     "watch:css": "tailwindcss -i ./styles.input.css -o ./styles.css --watch",
     "watch": "concurrently \"npm run watch:app\" \"npm run watch:css\"",
-    "start": "npm run build && concurrently \"npm run watch\" \"serve .\""
+    "start": "concurrently \"npm run watch\" \"serve .\""
   },
   "devDependencies": {
     "@tailwindcss/cli": "4.2.4",
