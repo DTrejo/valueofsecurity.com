@@ -43,7 +43,7 @@
         return numberFormatter.format(value)
       }
 
-      async function loadMetricsPayload() {
+      async function loadCompanyPayload() {
         const metricsUrl =
           typeof document === 'undefined'
             ? 'http://localhost:3000/company-metrics/chime.json'
@@ -57,15 +57,17 @@
         }
       }
 
-      const metricsPayload = await loadMetricsPayload()
+      const companyPayload = await loadCompanyPayload()
 
-      export function App(props) {
-        const metrics = props.metrics
+      export function App({ company = {} }) {
+        const ticker = company.ticker ?? 'N/A'
+        const fiscalYear = company.fiscalYear ?? 'N/A'
+        const metrics = company.metrics ?? {}
 
         return html`
           <main style=${{ fontFamily: 'Arial, sans-serif', maxWidth: '720px', margin: '2rem auto', padding: '0 1rem' }}>
-            <h1>${props.ticker} Metrics</h1>
-            <p>Fiscal Year ${props.fiscalYear}</p>
+            <h1>${ticker} Metrics</h1>
+            <p>Fiscal Year ${fiscalYear}</p>
             <table style=${{ borderCollapse: 'collapse', width: '100%' }}>
               <thead>
                 <tr>
@@ -87,13 +89,11 @@
       }
 
       export const appProps = {
-        ticker: metricsPayload.ticker ?? 'CHYM',
-        fiscalYear: metricsPayload.fiscalYear ?? 2025,
-        metrics: metricsPayload.metrics ?? {},
+        company: companyPayload,
       }
 
       export function renderApp() {
-        return html`<${App} ticker=${appProps.ticker} fiscalYear=${appProps.fiscalYear} metrics=${appProps.metrics} />`
+        return html`<${App} company=${appProps.company} />`
       }
 
       if (typeof document !== 'undefined') {
