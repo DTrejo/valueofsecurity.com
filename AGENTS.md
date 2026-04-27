@@ -1,0 +1,1 @@
+- When writing jsx/react/preact, never use `useEffect`
