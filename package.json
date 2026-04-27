@@ -1,8 +1,13 @@
 {
   "scripts": {
-    "start": "serve ."
+    "build": "node scripts/build.mjs",
+    "start": "npm run build && serve ."
   },
   "devDependencies": {
+    "cheerio": "1.2.0",
+    "htm": "3.1.1",
+    "preact": "10.29.1",
+    "preact-render-to-string": "6.6.7",
     "serve": "14.2.6"
   }
 }

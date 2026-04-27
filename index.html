@@ -1,28 +1,42 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preact Hello</title>
 </head>
 <body>
-  <script type="module">
-    import { h, render } from 'https://esm.sh/preact';
-    import htm from 'https://esm.sh/htm';
+  <div id="app"><h1>Hello World!</h1></div>
 
-    // Initialize htm with Preact
+  <script type="importmap">
+    {
+      "imports": {
+        "preact": "https://esm.sh/preact",
+        "htm": "https://esm.sh/htm"
+      }
+    }
+  </script>
+
+  <script type="module" id="app-module">
+    import { h, hydrate } from 'preact';
+    import htm from 'htm';
+
     const html = htm.bind(h);
 
-    function App(props) {
+    export function App(props) {
       return html`
         <h1>Hello ${props.name}!</h1>
       `;
     }
 
-    render(
-      html`<${App} name="World" />`,
-      document.body
-    );
+    export const appProps = { name: 'World' };
+
+    export function renderApp() {
+      return html`<${App} name=${appProps.name} />`;
+    }
+
+    if (typeof document !== 'undefined') {
+      hydrate(renderApp(), document.getElementById('app'));
+    }
   </script>
-</body>
-</html>
+
+
+</body></html>
