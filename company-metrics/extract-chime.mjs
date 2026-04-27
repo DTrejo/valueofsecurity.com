@@ -35,6 +35,7 @@ $('xbrli\\:context').each((_, element) => {
 });
 
 const getAttr = (element, name) => element.attr(name) ?? element.attr(name.toLowerCase()) ?? null;
+const filingBodyText = $('body').text().replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
 
 const toNumber = (fact) => {
   const format = getAttr(fact, 'format');
@@ -108,6 +109,29 @@ const pickValue = (query) => {
   return match ? match.value : null;
 };
 
+const pickEmployeeCountFromNarrative = (year) => {
+  const patterns = [
+    new RegExp(
+      `(?:OUR\\s+EMPLOYEES\\s*)?As\\s+of\\s+[A-Za-z]+\\s+\\d{1,2},\\s*${year},\\s+we\\s+had\\s+(?:approximately\\s+)?([\\d,]+)\\s+[^.]{0,120}?\\b(?:employees|employee|full-time|part-time|seasonal|associates|workers|staff|chimers)\\b`,
+      'i',
+    ),
+    new RegExp(
+      `(?:OUR\\s+EMPLOYEES\\s*)?As\\s+of\\s+[A-Za-z]+\\s+\\d{1,2},\\s*${year},\\s+we\\s+had\\s+(?:approximately\\s+)?([\\d,]+)\\b`,
+      'i',
+    ),
+  ];
+
+  for (const pattern of patterns) {
+    const match = filingBodyText.match(pattern);
+    if (!match) continue;
+
+    const value = Number(match[1].replace(/,/g, ''));
+    if (Number.isFinite(value)) return value;
+  }
+
+  return null;
+};
+
 const revenue = pickValue({ names: 'us-gaap:Revenues', type: 'duration', year: 2025 });
 const previousRevenue = pickValue({ names: 'us-gaap:Revenues', type: 'duration', year: 2024 });
 const grossProfit = pickValue({ names: 'us-gaap:GrossProfit', type: 'duration', year: 2025 });
@@ -154,6 +178,8 @@ const employeeCount =
   pickValue({ names: 'dei:EntityNumberOfEmployees', type: 'duration', year: 2025, includeSegment: true }) ??
   pickValue({ names: 'dei:EntityNumberOfEmployees', type: 'instant', year: 2025, includeSegment: true }) ??
   pickValue({ names: 'us-gaap:NumberOfEmployees', type: 'duration', year: 2025, includeSegment: true }) ??
+  pickValue({ names: 'us-gaap:NumberOfEmployees', type: 'instant', year: 2025, includeSegment: true }) ??
+  pickEmployeeCountFromNarrative(2025) ??
   null;
 
 const toPct = (numerator, denominator) =>
