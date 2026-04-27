@@ -2,10 +2,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Value Metrics</title>
-  </head>
+  <link rel="stylesheet" href="/styles.css"></head>
+    
   <body>
     <!-- Server rendered by ./scripts/build.mjs -->
-    <div id="app"><main style="font-family:Arial, sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;"><h1>CHYM Metrics</h1><p>Fiscal Year 2025</p><table style="border-collapse:collapse;width:100%;"><thead><tr><th style="border-bottom:1px solid #ddd;text-align:left;padding:0.5rem 0;">Metric</th><th style="border-bottom:1px solid #ddd;text-align:right;padding:0.5rem 0;">Value</th></tr></thead><tbody><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Revenue</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">$2,186,770,000</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Revenue Growth</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">30.69%</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Gross Margin</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">87.97%</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">EBITDA Margin</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">-46.19%</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Free Cash Flow Margin</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">1.50%</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Net Debt</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">-$434,852,000</td></tr><tr><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;">Employee Count</td><td style="border-bottom:1px solid #f0f0f0;padding:0.6rem 0;text-align:right;">N/A</td></tr></tbody></table></main></div>
+    <div id="app"><main class="mx-auto my-8 max-w-[720px] px-4 font-sans"><h1 class="text-3xl font-semibold">CHYM Metrics</h1><p class="mb-4 text-sm text-gray-600">Fiscal Year 2025</p><table class="w-full border-collapse"><thead><tr><th class="border-b border-gray-300 py-2 text-left">Metric</th><th class="border-b border-gray-300 py-2 text-right">Value</th></tr></thead><tbody><tr><td class="border-b border-gray-100 py-2">Revenue</td><td class="border-b border-gray-100 py-2 text-right tabular-nums">$2,186,770,000</td></tr><tr><td class="border-b border-gray-100 py-2">Revenue Growth</td><td class="border-b border-gray-100 py-2 text-right tabular-nums">30.69%</td></tr><tr><td class="border-b border-gray-100 py-2">Gross Margin</td><td class="border-b border-gray-100 py-2 text-right tabular-nums">87.97%</td></tr><tr><td class="border-b border-gray-100 py-2">EBITDA Margin</td><td class="border-b border-gray-100 py-2 text-right tabular-nums">-46.19%</td></tr><tr><td class="border-b border-gray-100 py-2">Free Cash Flow Margin</td><td class="border-b border-gray-100 py-2 text-right tabular-nums">1.50%</td></tr><tr><td class="border-b border-gray-100 py-2">Net Debt</td><td class="border-b border-gray-100 py-2 text-right tabular-nums">-$434,852,000</td></tr><tr><td class="border-b border-gray-100 py-2">Employee Count</td><td class="border-b border-gray-100 py-2 text-right tabular-nums">N/A</td></tr></tbody></table></main></div>
 
     <script type="importmap">
       {
@@ -65,21 +66,21 @@
         const metrics = company.metrics ?? {}
 
         return html`
-          <main style=${{ fontFamily: 'Arial, sans-serif', maxWidth: '720px', margin: '2rem auto', padding: '0 1rem' }}>
-            <h1>${ticker} Metrics</h1>
-            <p>Fiscal Year ${fiscalYear}</p>
-            <table style=${{ borderCollapse: 'collapse', width: '100%' }}>
+          <main class="mx-auto my-8 max-w-[720px] px-4 font-sans">
+            <h1 class="text-3xl font-semibold">${ticker} Metrics</h1>
+            <p class="mb-4 text-sm text-gray-600">Fiscal Year ${fiscalYear}</p>
+            <table class="w-full border-collapse">
               <thead>
                 <tr>
-                  <th style=${{ borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem 0' }}>Metric</th>
-                  <th style=${{ borderBottom: '1px solid #ddd', textAlign: 'right', padding: '0.5rem 0' }}>Value</th>
+                  <th class="border-b border-gray-300 py-2 text-left">Metric</th>
+                  <th class="border-b border-gray-300 py-2 text-right">Value</th>
                 </tr>
               </thead>
               <tbody>
                 ${orderedMetrics.map(([key, label]) => html`
                   <tr key=${key}>
-                    <td style=${{ borderBottom: '1px solid #f0f0f0', padding: '0.6rem 0' }}>${label}</td>
-                    <td style=${{ borderBottom: '1px solid #f0f0f0', padding: '0.6rem 0', textAlign: 'right' }}>${formatValue(key, metrics[key])}</td>
+                    <td class="border-b border-gray-100 py-2">${label}</td>
+                    <td class="border-b border-gray-100 py-2 text-right tabular-nums">${formatValue(key, metrics[key])}</td>
                   </tr>
                 `)}
               </tbody>
