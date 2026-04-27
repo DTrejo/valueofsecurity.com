@@ -1,2 +1,102 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "dollar-light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #ebe6c5;
+  --color-base-200: #c1cdc5;
+  --color-base-300: #a6834b;
+  --color-base-content: #021c03;
+  --color-primary: #0c7819;
+  --color-primary-content: #ebe6c5;
+  --color-secondary: #020d81;
+  --color-secondary-content: #ebe6c5;
+  --color-accent: #baad2e;
+  --color-accent-content: #021c03;
+  --color-neutral: #c7851d;
+  --color-neutral-content: #021c03;
+  --color-info: #121968;
+  --color-info-content: #ebe6c5;
+  --color-success: #0c7819;
+  --color-success-content: #ebe6c5;
+  --color-warning: #c7851d;
+  --color-warning-content: #021c03;
+  --color-error: #9d3210;
+  --color-error-content: #ebe6c5;
+
+  --radius-selector: 1rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@layer base {
+  html,
+  body,
+  main,
+  table,
+  th,
+  td,
+  .btn {
+    transition-property: background-color, border-color, fill, stroke;
+    transition-duration: 250ms;
+    transition-timing-function: ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html,
+    body,
+    main,
+    table,
+    th,
+    td,
+    .btn {
+      transition-duration: 0ms;
+    }
+  }
+}
+
+@plugin "daisyui/theme" {
+  name: "dollar-dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #021c03;
+  --color-base-200: #121968;
+  --color-base-300: #020d81;
+  --color-base-content: #ebe6c5;
+  --color-primary: #baad2e;
+  --color-primary-content: #021c03;
+  --color-secondary: #c1cdc5;
+  --color-secondary-content: #021c03;
+  --color-accent: #c7851d;
+  --color-accent-content: #021c03;
+  --color-neutral: #660f05;
+  --color-neutral-content: #ebe6c5;
+  --color-info: #c1cdc5;
+  --color-info-content: #021c03;
+  --color-success: #0c7819;
+  --color-success-content: #ebe6c5;
+  --color-warning: #c7851d;
+  --color-warning-content: #021c03;
+  --color-error: #9d3210;
+  --color-error-content: #ebe6c5;
+
+  --radius-selector: 1rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}

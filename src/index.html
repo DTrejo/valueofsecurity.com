@@ -2,6 +2,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Value Metrics</title>
+  <link rel="stylesheet" href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="/styles.css"></head>
     
   <body>
@@ -12,6 +13,7 @@
       {
         "imports": {
           "preact": "https://esm.sh/preact",
+          "preact/hooks": "https://esm.sh/preact/hooks",
           "htm": "https://esm.sh/htm"
         }
       }
@@ -19,9 +21,16 @@
 
     <script type="module" id="app-module">
       import { h, hydrate } from 'preact'
+      import { useState } from 'preact/hooks'
       import htm from 'htm'
 
       const html = htm.bind(h)
+      const LIGHT_THEME = 'dollar-light'
+      const DARK_THEME = 'dollar-dark'
+
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-theme', LIGHT_THEME)
+      }
 
       const orderedMetrics = [
         ['revenue', 'Revenue'],
@@ -65,11 +74,47 @@
         const ticker = company.ticker ?? 'N/A'
         const fiscalYear = company.fiscalYear ?? 'N/A'
         const metrics = company.metrics ?? {}
+        const [theme, setTheme] = useState(LIGHT_THEME)
+        const isLightTheme = theme === LIGHT_THEME
+
+        function toggleTheme() {
+          const nextTheme = isLightTheme ? DARK_THEME : LIGHT_THEME
+          if (typeof document !== 'undefined') {
+            document.documentElement.setAttribute('data-theme', nextTheme)
+          }
+          setTheme(nextTheme)
+        }
 
         return html`
           <main class="mx-auto my-8 max-w-[720px] px-4 font-sans">
-            <h1 class="text-3xl font-semibold">${ticker} Metrics</h1>
-            <p class="mb-4 text-sm text-gray-600">Fiscal Year ${fiscalYear}</p>
+            <div class="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h1 class="text-3xl font-semibold">${ticker} Metrics</h1>
+                <p class="text-sm text-gray-600">Fiscal Year ${fiscalYear}</p>
+              </div>
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 rounded-full border border-base-content/15 bg-base-300/70 p-1"
+                aria-label=${isLightTheme ? 'Switch to dark theme' : 'Switch to light theme'}
+                title=${isLightTheme ? 'Switch to dark theme' : 'Switch to light theme'}
+                onClick=${toggleTheme}
+              >
+                <span class=${`inline-flex h-7 w-7 items-center justify-center rounded-full transition ${
+                  isLightTheme
+                    ? 'bg-base-100 text-base-content shadow-sm ring-1 ring-base-content/15'
+                    : 'text-base-content/70'
+                }`}>
+                  <i class="fa-solid fa-sun"></i>
+                </span>
+                <span class=${`inline-flex h-7 w-7 items-center justify-center rounded-full transition ${
+                  isLightTheme
+                    ? 'text-base-content/70'
+                    : 'bg-base-100 text-base-content shadow-sm ring-1 ring-base-content/15'
+                }`}>
+                  <i class="fa-solid fa-moon"></i>
+                </span>
+              </button>
+            </div>
             <table class="w-full border-collapse">
               <thead>
                 <tr>
