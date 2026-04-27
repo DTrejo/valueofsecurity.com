@@ -1,3 +1,3 @@
 - When writing jsx/react/preact, never use `useEffect`
 - If something is unclear, check out readme.md or docs/
-- If you feel the need to build, don't, because `npm start` should already be running
+- `npm start` should already be running and rebuilds js, html, and css–so skip manual rebuilds unless explicitly requested

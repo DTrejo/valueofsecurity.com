@@ -70,7 +70,7 @@
     }
   }
 
-  [data-theme="dollar-light"] h1 {
+  /* [data-theme="dollar-light"] h1 {
     color: oklch(28.47% 0.1807 264.75);
   }
 
@@ -116,7 +116,7 @@
 
   [data-theme="dollar-dark"] h6 {
     color: oklch(92.03% 0.0438 100.10);
-  }
+  } */
 }
 
 @plugin "daisyui/theme" {
