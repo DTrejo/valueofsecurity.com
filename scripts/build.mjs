@@ -40,6 +40,9 @@ const prerenderedApp = renderToString(appModule.renderApp());
 appElement.empty().append(prerenderedApp);
 const output = $.html();
 
-await writeFile(outputPath, output, 'utf8');
-
-console.log(`Built ${outputPath}`);
+if (output !== indexSource) {
+  await writeFile(outputPath, output, 'utf8');
+  console.log(`Built ${outputPath}`);
+} else {
+  console.log(`No changes for ${outputPath}`);
+}
