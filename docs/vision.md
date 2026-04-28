@@ -13,13 +13,34 @@
 - Douglas hubbard’s how to measure anything book: tell me the table of contents verbatim   
 - Now, give me a holistic playbook for making business decisions (based only on what he says)  
 - [https://investors.chime.com/node/7581/html#i1f3f56f875cf425ea78fcca0a339f364_672](https://investors.chime.com/node/7581/html#i1f3f56f875cf425ea78fcca0a339f364_672)  
-- Idyll   
-- Observeable  
 - Annual loss expectancy. Single loss expectancy   
-- What are the best most modern alternatives to tanglejs?  
-- GitHub links for 1,2. My goal is to build a security investment version of engineerworth.com  
-- Any newer framework options?  
-- Give me an observable example  
 - Let’s say I want to create data presets for the site based on two companies: chime (10k form), and vercel (whatever we can figure out publicly).  
 -  1. Clearly lay out the data we need to collect  
 -  2. Create a set of examples ala engineerworth which flow from the data (plain text only for now)  
+
+## Value flow scenarios
+
+1. member value == 3-20x revenue
+revenue
+ransom amount for complete business stoppage
+
+2. member data
+number of members
+number of sensitive (confidential, restricted) fields per member (e.g. fintech preset, infra preset which means all industries: fintech + hipaa + government)
+fine per confidential, fine per restricted (is it different?)
+dark web sale value (PRN mostly?)
+bug bounty value
+
+3. vulnerabilities e.g. RCE 
+government fine
+dark web sale value
+bug bounty value
+
+4. consent order (repeated security issues)
+Continuing cost to business per year
+
+5. emotional / brand value
+value of member trust
+founders sleep well at night
+
+6. security engineers (?) per engineer
