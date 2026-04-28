@@ -249,10 +249,6 @@ function runVercelScenarios(vercel) {
 
 const chime = await loadCompany('chime');
 const vercel = await loadCompany('vercel');
-const chimeMissing = runChimeScenarios(chime);
-const vercelMissing = runVercelScenarios(vercel);
-
-console.log('\nMissing numbers to provide:');
-console.log(`- Chime: ${chimeMissing.size ? [...chimeMissing].join(', ') : 'none'}`);
-console.log(`- Vercel: ${vercelMissing.size ? [...vercelMissing].join(', ') : 'none'}`);
+runChimeScenarios(chime);
+runVercelScenarios(vercel);
 console.log('(?) = conservative guessed number');
