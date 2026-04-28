@@ -182,8 +182,10 @@
         const hasKnownTicker = normalizedTicker.length > 0 && normalizedTicker.toLowerCase() !== 'unknown'
         const isPublicCompany = hasKnownTicker
         const listingStatus = isPublicCompany ? 'Public' : 'Private'
-        const tickerLabel = hasKnownTicker ? normalizedTicker : 'unknown'
         const fiscalYear = company.fiscalYear ?? 'N/A'
+        const metadataParts = [`Fiscal Year ${fiscalYear}`]
+        if (isPublicCompany) metadataParts.push(normalizedTicker)
+        metadataParts.push(listingStatus)
         const metrics = company.metrics ?? {}
         const companyValueMetric = isPublicCompany ? ['marketCap', 'Market Cap'] : ['valuation', 'Valuation']
         const orderedMetrics = [
@@ -235,7 +237,7 @@
                   />
                   <span>Metrics</span>
                 </h2>
-                <p class="text-sm text-gray-600">Fiscal Year ${fiscalYear} • ${tickerLabel} • ${listingStatus}</p>
+                <p class="text-sm text-gray-600">${metadataParts.join(' • ')}</p>
               </div>
             </div>
             <table class="w-full border-collapse">
