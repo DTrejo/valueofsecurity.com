@@ -103,9 +103,10 @@
         return { company, ebitdaMarginPct }
       }
 
-      function writeUrlParams(nextParams) {
+      function writeUrlParams(nextParams, options = {}) {
         if (typeof window === 'undefined') return
-        const searchParams = new URLSearchParams(window.location.search)
+        const { reset = false } = options
+        const searchParams = reset ? new URLSearchParams() : new URLSearchParams(window.location.search)
         Object.entries(nextParams).forEach(([key, value]) => {
           if (value === null || value === undefined || value === '') {
             searchParams.delete(key)
@@ -249,8 +250,11 @@
         const hasKnownTicker = normalizedTicker.length > 0 && normalizedTicker.toLowerCase() !== 'unknown'
         const isPublicCompany = hasKnownTicker
         const listingStatus = isPublicCompany ? 'Public' : 'Private'
-        const fiscalYear = company.fiscalYear ?? 'N/A'
-        const metadataParts = [`Fiscal Year ${fiscalYear}`]
+        const fiscalYear = company.fiscalYear
+        const metadataFiscalYear = typeof fiscalYear === 'string' && fiscalYear.trim().length > 0
+          ? fiscalYear.trim()
+          : `Fiscal Year ${fiscalYear ?? 'N/A'}`
+        const metadataParts = [metadataFiscalYear]
         if (isPublicCompany) metadataParts.push(normalizedTicker)
         metadataParts.push(listingStatus)
         const metrics = company.metrics ?? {}
@@ -277,9 +281,9 @@
 
         async function handleCompanyChange(event) {
           const nextCompanySlug = getKnownCompanySlug(event.currentTarget.value)
-          const nextUrlParams = { ...urlParams, company: nextCompanySlug }
+          const nextUrlParams = { company: nextCompanySlug, ebitdaMarginPct: null }
           setUrlParams(nextUrlParams)
-          writeUrlParams(nextUrlParams)
+          writeUrlParams(nextUrlParams, { reset: true })
           setIsLoadingCompany(true)
           const nextCompany = await loadCompanyPayload(nextCompanySlug)
           setCompany(nextCompany)
