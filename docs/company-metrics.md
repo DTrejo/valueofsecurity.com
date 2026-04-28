@@ -1,19 +1,19 @@
 # Company Metrics for Public + Private Valuation
 
-1. **Revenue (TTM or last fiscal year)**  
+1. **Market Cap (public) / Valuation (private)**  
+   Sets the top-line company value anchor used in comparisons and value framing.
+
+2. **Revenue (TTM or last fiscal year)**  
    Baseline company size and the starting point for most valuation methods.
 
-2. **Revenue Growth (%)**  
+3. **Revenue Growth (%)**  
    Indicates business momentum and expected future scale.
 
-3. **Gross Margin (%)**  
+4. **Gross Margin (%)**  
    Captures core unit economics before operating overhead.
 
-4. **EBITDA Margin (%)**  
+5. **EBITDA Margin (%)**  
    Shows operating profitability in a broadly comparable way.
-
-5. **Free Cash Flow Margin (%)** *(or Burn Margin if negative)*  
-   Measures whether operations generate cash or consume it.
 
 6. **Net Debt (Debt − Cash)**  
    Reflects financial risk and balance-sheet pressure.

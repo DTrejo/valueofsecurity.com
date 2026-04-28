@@ -118,13 +118,20 @@
       const initialUrlParams = readUrlParams()
       const companyPayload = await loadCompanyPayload(initialUrlParams.company)
 
-      function CompanyPicker({ options = [], value, onChange, disabled = false, showLabel = true }) {
+      function CompanyPicker({
+        options = [],
+        value,
+        onChange,
+        disabled = false,
+        showLabel = true,
+        selectClassName = 'select select-ghost w-fit appearance-none flex-none rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 bg-transparent px-0 pb-0 pr-7 text-3xl',
+      }) {
         const labelClass = showLabel ? 'inline-flex w-fit items-center gap-2' : 'inline-flex w-fit items-center'
         return html`
           <label class=${labelClass}>
             ${showLabel ? html`<span class="text-sm font-medium text-gray-600">Company</span>` : null}
             <select
-              class="select select-ghost w-fit appearance-none flex-none rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 bg-transparent px-0 pb-0 pr-7 text-3xl"
+              class=${selectClassName}
               style=${{ fieldSizing: 'content' }}
               value=${value}
               onChange=${onChange}
@@ -180,12 +187,11 @@
         const metrics = company.metrics ?? {}
         const companyValueMetric = isPublicCompany ? ['marketCap', 'Market Cap'] : ['valuation', 'Valuation']
         const orderedMetrics = [
+          companyValueMetric,
           ['revenue', 'Revenue'],
           ['revenueGrowthPct', 'Revenue Growth'],
           ['grossMarginPct', 'Gross Margin'],
-          companyValueMetric,
           ['ebitdaMarginPct', 'EBITDA Margin'],
-          ['freeCashFlowMarginPct', 'Free Cash Flow Margin'],
           ['employeeCount', 'Employee Count'],
         ]
         const [theme, setTheme] = useState(LIGHT_THEME)
@@ -213,20 +219,24 @@
         return html`
           <main class="mx-auto my-8 max-w-[720px] px-4 font-sans">
             <div class="mb-4 flex items-start justify-between gap-4">
+              <h1 class="text-3xl font-semibold">Security Value</h1>
+              <${ThemePicker} isLightTheme=${isLightTheme} onToggleTheme=${toggleTheme} />
+            </div>
+            <div class="mb-4">
               <div>
-                <h1 class="mb-2 flex items-center gap-2 text-3xl font-semibold">
+                <h2 class="mb-2 flex items-center gap-2 text-2xl font-semibold">
                   <${CompanyPicker}
                     options=${COMPANY_OPTIONS}
                     value=${selectedCompanySlug}
                     onChange=${handleCompanyChange}
                     disabled=${isLoadingCompany}
                     showLabel=${false}
+                    selectClassName="select select-ghost w-fit appearance-none flex-none rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 bg-transparent px-0 pb-0 pr-7 text-2xl"
                   />
                   <span>Metrics</span>
-                </h1>
+                </h2>
                 <p class="text-sm text-gray-600">Fiscal Year ${fiscalYear} • ${tickerLabel} • ${listingStatus}</p>
               </div>
-              <${ThemePicker} isLightTheme=${isLightTheme} onToggleTheme=${toggleTheme} />
             </div>
             <table class="w-full border-collapse">
               <thead>

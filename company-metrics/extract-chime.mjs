@@ -175,14 +175,6 @@ async function buildOutput({ sourceFile = defaultSourceFile } = {}) {
       type: 'duration',
       year: 2025,
     });
-  const operatingCashFlow = pickValue({
-    names: 'us-gaap:NetCashProvidedByUsedInOperatingActivities',
-    type: 'duration',
-    year: 2025,
-  });
-  const capex =
-    pickValue({ names: 'us-gaap:PaymentsToAcquireProductiveAssets', type: 'duration', year: 2025 }) ??
-    pickValue({ names: 'us-gaap:PaymentsToAcquirePropertyPlantAndEquipment', type: 'duration', year: 2025 });
   const companyName = pickText({ names: 'dei:EntityRegistrantName' }) ?? 'unknown';
   const ticker = pickText({ names: 'dei:TradingSymbol' }) ?? 'unknown';
   const marketCap = pickValue({ names: 'dei:EntityPublicFloat', type: 'instant', year: 2025 });
@@ -204,10 +196,6 @@ async function buildOutput({ sourceFile = defaultSourceFile } = {}) {
     ? operatingIncome + depreciationAndAmortization
     : null;
   const ebitdaMarginPct = toPct(ebitda, revenue);
-  const freeCashFlow = typeof operatingCashFlow === 'number' && typeof capex === 'number'
-    ? operatingCashFlow - capex
-    : null;
-  const freeCashFlowMarginPct = toPct(freeCashFlow, revenue);
 
   return {
     companyName,
@@ -222,7 +210,6 @@ async function buildOutput({ sourceFile = defaultSourceFile } = {}) {
       marketCap,
       valuation: null,
       ebitdaMarginPct,
-      freeCashFlowMarginPct,
       employeeCount,
     },
   };
