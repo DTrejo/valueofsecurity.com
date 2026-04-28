@@ -1,12 +1,13 @@
 # Security Value
 
 ## Project layout
-- `src/` contains source files (`src/index.html`, `src/styles.input.css`).
-- Project root contains built artifacts (`index.html`, `styles.css`) so the same branch can be served directly by GitHub Pages.
+- Project root contains source files (`index.html`, `styles.input.css`).
+- `company-metrics/` contains source JSON metrics files.
+- `gh-pages/` contains build output (`gh-pages/index.html`, `gh-pages/styles.css`, `gh-pages/company-metrics/*.json`).
 
 ## Local development
-- `npm start` runs file watchers and serves the project root.
-- `npm run build` rebuilds root artifacts from `src/`.
+- `npm start` runs file watchers and serves `gh-pages/`.
+- `npm run build` rebuilds `gh-pages/` artifacts from root source files and `company-metrics/`.
 
 ## Adding/updating new company 10k data
 1. Find latest 10k https://www.sec.gov/edgar/search/#/q=CHYM&dateRange=1y&filter_forms=10-K

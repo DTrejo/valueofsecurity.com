@@ -1,4 +1,5 @@
 - When writing jsx/react/preact, never use `useEffect`
 - When something is unclear, check out readme.md or docs/
 - Do not run `npm run build` (nor other manual validators) unless the user explicitly requests it; `npm start` is assumed to already be running and handles js/html/css rebuilds.
-- When committing, don't diff built files (`index.html`, `styles.css`)
+- Source files live at project root (`index.html`, `styles.input.css`); build output is under `gh-pages/`
+- When committing, don't diff built files in `gh-pages/` (`gh-pages/index.html`, `gh-pages/styles.css`, `gh-pages/company-metrics/*.json`)

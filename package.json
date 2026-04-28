@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "build:css": "tailwindcss -i ./src/styles.input.css -o ./gh-pages/styles.css --minify",
+    "build:css": "tailwindcss -i ./styles.input.css -o ./gh-pages/styles.css --minify",
     "build": "npm run build:css && node scripts/build.mjs",
-    "watch:app": "node --watch-path src/index.html --watch-path scripts/build.mjs scripts/build.mjs",
+    "watch:app": "node --watch-path index.html --watch-path scripts/build.mjs scripts/build.mjs",
     "watch:css": "npm run build:css -- --watch",
     "watch": "concurrently \"npm run watch:app\" \"npm run watch:css\"",
     "serve": "serve gh-pages",

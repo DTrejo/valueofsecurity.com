@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
+import { copyFile, cp, mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { load } from 'cheerio';
@@ -6,11 +6,15 @@ import renderToString from 'preact-render-to-string';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const sourcePath = path.resolve(__dirname, '../src/index.html');
+const sourcePath = path.resolve(__dirname, '../index.html');
 const outputDirectoryPath = path.resolve(__dirname, '../gh-pages');
 const outputPath = path.resolve(outputDirectoryPath, 'index.html');
 const companyMetricsPath = path.resolve(__dirname, '../company-metrics');
-const companyDataOutputPath = path.resolve(outputDirectoryPath, 'company-data');
+const companyMetricsOutputPath = path.resolve(outputDirectoryPath, 'company-metrics');
+const fontAwesomeCssPath = path.resolve(__dirname, '../node_modules/@fortawesome/fontawesome-free/css/all.min.css');
+const fontAwesomeWebfontsPath = path.resolve(__dirname, '../node_modules/@fortawesome/fontawesome-free/webfonts');
+const fontAwesomeOutputCssPath = path.resolve(outputDirectoryPath, 'vendor/fontawesome-free/css/all.min.css');
+const fontAwesomeOutputWebfontsPath = path.resolve(outputDirectoryPath, 'vendor/fontawesome-free/webfonts');
 const sourceTemplate = await readFile(sourcePath, 'utf8');
 const companyNameSlugEntries = await (async function readCompanyNameSlugEntries() {
   const entries = await readdir(companyMetricsPath, { withFileTypes: true });
@@ -45,26 +49,30 @@ const companyNameSlugEntries = await (async function readCompanyNameSlugEntries(
 })();
 
 if (!sourceTemplate.includes('__COMPANY_NAME_SLUG__')) {
-  throw new Error('Could not find __COMPANY_NAME_SLUG__ placeholder in src/index.html');
+  throw new Error('Could not find __COMPANY_NAME_SLUG__ placeholder in index.html');
 }
 
 const indexSource = sourceTemplate.replace('__COMPANY_NAME_SLUG__', JSON.stringify(companyNameSlugEntries));
 await mkdir(outputDirectoryPath, { recursive: true });
-await mkdir(companyDataOutputPath, { recursive: true });
+await mkdir(companyMetricsOutputPath, { recursive: true });
+await mkdir(path.dirname(fontAwesomeOutputCssPath), { recursive: true });
 
-const companyDataOutputEntries = await readdir(companyDataOutputPath, { withFileTypes: true }).catch(() => []);
-for (const entry of companyDataOutputEntries) {
+const companyMetricsOutputEntries = await readdir(companyMetricsOutputPath, { withFileTypes: true }).catch(() => []);
+for (const entry of companyMetricsOutputEntries) {
   if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
-  await unlink(path.resolve(companyDataOutputPath, entry.name)).catch(() => {});
+  await unlink(path.resolve(companyMetricsOutputPath, entry.name)).catch(() => {});
 }
 
 const companyMetricEntries = await readdir(companyMetricsPath, { withFileTypes: true });
 for (const entry of companyMetricEntries) {
   if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
   const sourceFilePath = path.resolve(companyMetricsPath, entry.name);
-  const outputFilePath = path.resolve(companyDataOutputPath, entry.name);
+  const outputFilePath = path.resolve(companyMetricsOutputPath, entry.name);
   await copyFile(sourceFilePath, outputFilePath);
 }
+
+await copyFile(fontAwesomeCssPath, fontAwesomeOutputCssPath);
+await cp(fontAwesomeWebfontsPath, fontAwesomeOutputWebfontsPath, { recursive: true, force: true });
 
 const existingOutput = await readFile(outputPath, 'utf8').catch(() => null);
 const $ = load(indexSource);
