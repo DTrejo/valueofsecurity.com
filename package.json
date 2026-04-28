@@ -1,11 +1,12 @@
 {
   "scripts": {
-    "build:css": "tailwindcss -i ./src/styles.input.css -o ./styles.css --minify",
+    "build:css": "tailwindcss -i ./src/styles.input.css -o ./gh-pages/styles.css --minify",
     "build": "npm run build:css && node scripts/build.mjs",
     "watch:app": "node --watch-path src/index.html --watch-path scripts/build.mjs scripts/build.mjs",
     "watch:css": "npm run build:css -- --watch",
     "watch": "concurrently \"npm run watch:app\" \"npm run watch:css\"",
-    "start": "concurrently \"npm run watch\" \"serve .\""
+    "serve": "serve gh-pages",
+    "start": "concurrently \"npm run watch\" \"npm run serve\""
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "7.2.0",
