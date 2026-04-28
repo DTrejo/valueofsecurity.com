@@ -1,4 +1,4 @@
-import { readFile, unlink, writeFile } from 'node:fs/promises';
+import { readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { load } from 'cheerio';
@@ -8,7 +8,45 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const sourcePath = path.resolve(__dirname, '../src/index.html');
 const outputPath = path.resolve(__dirname, '../index.html');
-const indexSource = await readFile(sourcePath, 'utf8');
+const companyMetricsPath = path.resolve(__dirname, '../company-metrics');
+const sourceTemplate = await readFile(sourcePath, 'utf8');
+const companyNameSlugEntries = await (async function readCompanyNameSlugEntries() {
+  const entries = await readdir(companyMetricsPath, { withFileTypes: true });
+  const companyEntries = [];
+
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+    const filePath = path.resolve(companyMetricsPath, entry.name);
+    const fileRaw = await readFile(filePath, 'utf8').catch(() => null);
+    if (!fileRaw) continue;
+
+    let parsed;
+    try {
+      parsed = JSON.parse(fileRaw);
+    } catch {
+      continue;
+    }
+
+    if (!parsed || typeof parsed !== 'object') continue;
+    if (typeof parsed.companyName !== 'string' || parsed.companyName.trim().length === 0) continue;
+    const slug = path.basename(entry.name, '.json').trim().toLowerCase();
+    if (!/^[a-z0-9-]+$/.test(slug)) continue;
+
+    companyEntries.push({
+      name: parsed.companyName.trim(),
+      slug,
+    });
+  }
+
+  companyEntries.sort((a, b) => a.name.localeCompare(b.name));
+  return companyEntries;
+})();
+
+if (!sourceTemplate.includes('__COMPANY_NAME_SLUG__')) {
+  throw new Error('Could not find __COMPANY_NAME_SLUG__ placeholder in src/index.html');
+}
+
+const indexSource = sourceTemplate.replace('__COMPANY_NAME_SLUG__', JSON.stringify(companyNameSlugEntries));
 const existingOutput = await readFile(outputPath, 'utf8').catch(() => null);
 const $ = load(indexSource);
 
@@ -23,6 +61,7 @@ await writeFile(tempModulePath, appModuleSource, 'utf8');
 
 let appModule;
 try {
+  globalThis.COMPANY_NAME_SLUG = companyNameSlugEntries;
   const tempModuleUrl = `${pathToFileURL(tempModulePath).href}?t=${Date.now()}`;
   appModule = await import(tempModuleUrl);
 } finally {

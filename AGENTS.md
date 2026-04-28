@@ -1,4 +1,4 @@
 - When writing jsx/react/preact, never use `useEffect`
 - When something is unclear, check out readme.md or docs/
-- When you want to manually rebuild or run validators: `npm start` should already be running and rebuilds js, html, and css–so skip manual rebuilds and validators unless explicitly requested.
+- Do not run `npm run build` (nor other manual validators) unless the user explicitly requests it; `npm start` is assumed to already be running and handles js/html/css rebuilds.
 - When committing, don't diff built files (`index.html`, `styles.css`)
