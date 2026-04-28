@@ -119,12 +119,13 @@
       const companyPayload = await loadCompanyPayload(initialUrlParams.company)
 
       function CompanyPicker({ options = [], value, onChange, disabled = false, showLabel = true }) {
-        const labelClass = showLabel ? 'inline-flex items-center gap-2' : 'inline-flex'
+        const labelClass = showLabel ? 'inline-flex w-fit items-center gap-2' : 'inline-flex w-fit items-center'
         return html`
           <label class=${labelClass}>
             ${showLabel ? html`<span class="text-sm font-medium text-gray-600">Company</span>` : null}
             <select
-              class="select select-ghost select-xl min-w-[220px] underline decoration-dotted underline-offset-4"
+              class="select select-ghost w-fit appearance-none flex-none rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 bg-transparent px-0 pb-0 pr-7 text-3xl"
+              style=${{ fieldSizing: 'content' }}
               value=${value}
               onChange=${onChange}
               disabled=${disabled}
