@@ -20,3 +20,5 @@
 
 7. **Employee Count**  
    Gives efficiency context (for example, revenue per employee).
+
+TODO: add daisy tooltips to each of the metrics names that show on tap or hover based on @company-metrics/ @src/index.html
