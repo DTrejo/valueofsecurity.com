@@ -21,4 +21,12 @@
 7. **Employee Count**  
    Gives efficiency context (for example, revenue per employee).
 
-TODO: add daisy tooltips to each of the metrics names that show on tap or hover based on @company-metrics/ @src/index.html
+---
+
+As of early 2026, Vercel powers over 4 million websites. The platform hosts a massive ecosystem of both individual developers and enterprise customers, with data suggesting around 250,000 to 300,000+ companies use Vercel. 
+Key Customer & Usage Statistics (2026)
+Total Websites: >4 million.
+Company Usage: ~252,157 companies (as of early 2026,) to over 300,000.
+Active Users: Millions of developers use Next.js, with over 3 million customers on specific, high-scale AI products.
+Top Geographies: The United States leads with over 83,000 customers, followed by India (21k+) and the United Kingdom (15k+).
+Traffic: Vercel handles over 30 billion requests per week.

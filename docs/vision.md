@@ -10,7 +10,7 @@
 - **Expected Opportunity Loss (EOL)**  
 - **Sees the UI with data extracted from 10ks?**  
 - **Incorporate Monte Carlo ideas and probabilistic spreadsheet stuff from guesstimate?**  
-- Douglas hubbard’s how to measure anything book: tell me the table of contents verbatim   
+- Douglas hubbard’s how to measure anything book: output the table of contents verbatim  
 - Now, give me a holistic playbook for making business decisions (based only on what he says)  
 - [https://investors.chime.com/node/7581/html#i1f3f56f875cf425ea78fcca0a339f364_672](https://investors.chime.com/node/7581/html#i1f3f56f875cf425ea78fcca0a339f364_672)  
 - Annual loss expectancy. Single loss expectancy   
@@ -36,7 +36,7 @@ government fine
 dark web sale value
 bug bounty value
 
-4. consent order (repeated security issues)
+4. government consent order (repeated security issues)
 Continuing cost to business per year
 
 5. emotional / brand value
