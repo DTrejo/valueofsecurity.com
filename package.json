@@ -2,6 +2,7 @@
   "scripts": {
     "build:css": "tailwindcss -i ./styles.input.css -o ./gh-pages/styles.css --minify",
     "build": "npm run build:css && node scripts/build.mjs",
+    "demo": "node scripts/demo.mjs",
     "watch:app": "node --watch-path index.html --watch-path scripts/build.mjs scripts/build.mjs",
     "watch:css": "npm run build:css -- --watch",
     "watch": "concurrently \"npm run watch:app\" \"npm run watch:css\"",
