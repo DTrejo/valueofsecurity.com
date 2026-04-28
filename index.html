@@ -259,6 +259,15 @@
         metadataParts.push(listingStatus)
         const metrics = company.metrics ?? {}
         const companyValueMetric = isPublicCompany ? ['marketCap', 'Market Cap'] : ['valuation', 'Valuation']
+        const metricTooltipCopy = {
+          marketCap: 'Current public market value of equity (share price × shares outstanding).',
+          valuation: 'Estimated private company value based on the latest funding or analysis.',
+          revenue: 'Total annual revenue for the selected fiscal year.',
+          revenueGrowthPct: 'Year-over-year change in revenue.',
+          grossMarginPct: 'Gross profit as a percentage of revenue.',
+          ebitdaMarginPct: 'EBITDA as a percentage of revenue.',
+          employeeCount: 'Approximate total number of employees.',
+        }
         const orderedMetrics = [
           companyValueMetric,
           ['revenue', 'Revenue'],
@@ -337,7 +346,9 @@
               <tbody>
                 ${orderedMetrics.map(([key, label]) => html`
                   <tr key=${key}>
-                    <td class="border-b border-gray-100 py-2">${label}</td>
+                    <td class="border-b border-gray-100 py-2">
+                      <span class="tooltip tooltip-right block w-fit cursor-help" data-tip=${metricTooltipCopy[key] ?? label} tabindex="0">${label}</span>
+                    </td>
                     <td class="border-b border-gray-100 py-2 ${key === 'ebitdaMarginPct' ? '' : 'text-right tabular-nums'}">
                       ${key === 'ebitdaMarginPct'
                         ? html`<${SliderNumberInput}
