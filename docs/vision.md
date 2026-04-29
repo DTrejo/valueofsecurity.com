@@ -41,6 +41,25 @@ Continuing cost to business per year
 
 5. emotional / brand value
 value of member trust
-founders sleep well at night
+
+9. founders sleep well at night (salary, full loaded cost, 3-20x impact on revenue)
+    founder salary vs revenue
+    industry founder salary multiplier
+    fully loaded cost multiplier
+    3-20x founder value to the company
 
 6. security engineers (?) per engineer
+responsibility:
+    member value secured per security engineer
+    revenue secured per security engineer
+
+7. Single security project
+opportunity:
+    $ value of risk reduction as result of a project
+    loss exceedance curve
+    risk tolerance curve
+
+8. cyber insurance
+Annual cost
+1st claim
+2nd claim
