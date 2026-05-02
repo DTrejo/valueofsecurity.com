@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   deploy-gh-pages:
     docker:
-      - image: cimg/node:24
+      - image: cimg/node:24.15
     steps:
       - checkout
       - run:
