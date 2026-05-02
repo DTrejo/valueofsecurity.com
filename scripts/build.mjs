@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 const sourcePath = path.resolve(__dirname, '../index.html');
 const outputDirectoryPath = path.resolve(__dirname, '../gh-pages');
 const outputPath = path.resolve(outputDirectoryPath, 'index.html');
+const cnameSourcePath = path.resolve(__dirname, '../CNAME');
+const cnameOutputPath = path.resolve(outputDirectoryPath, 'CNAME');
 const companyMetricsPath = path.resolve(__dirname, '../company-metrics');
 const companyMetricsOutputPath = path.resolve(outputDirectoryPath, 'company-metrics');
 const fontAwesomeCssPath = path.resolve(__dirname, '../node_modules/@fortawesome/fontawesome-free/css/all.min.css');
@@ -73,6 +75,7 @@ for (const entry of companyMetricEntries) {
 
 await copyFile(fontAwesomeCssPath, fontAwesomeOutputCssPath);
 await cp(fontAwesomeWebfontsPath, fontAwesomeOutputWebfontsPath, { recursive: true, force: true });
+await copyFile(cnameSourcePath, cnameOutputPath);
 
 const existingOutput = await readFile(outputPath, 'utf8').catch(() => null);
 const $ = load(indexSource);
