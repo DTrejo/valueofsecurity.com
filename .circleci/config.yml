@@ -16,8 +16,12 @@ jobs:
           name: Deploy force-orphan commit to gh-pages
           command: |
             set -euo pipefail
-            if [ -z "${GITHUB_TOKEN:-}" ]; then
-              echo "GITHUB_TOKEN is required to push to gh-pages"
+            if [ "${CIRCLE_BRANCH:-}" != "main" ]; then
+              echo "Skipping deploy on non-main branch: ${CIRCLE_BRANCH:-unknown}"
+              exit 0
+            fi
+            if [ -z "${VALUEOFSECURITY_COM_GITHUB_TOKEN:-}" ]; then
+              echo "VALUEOFSECURITY_COM_GITHUB_TOKEN is required to push to gh-pages"
               exit 1
             fi
 
@@ -33,7 +37,7 @@ jobs:
             touch .nojekyll
             git add -A
             git commit -m "Deploy ${CIRCLE_SHA1}"
-            git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git"
+            git remote add origin "https://x-access-token:${VALUEOFSECURITY_COM_GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git"
             git push --force origin gh-pages
 
 workflows:
