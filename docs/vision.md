@@ -38,7 +38,8 @@
 - [ ] write announcement message for linkedin+etc
 - [ ] Generate social image
 - [ ] Announce on linkedin+etc
-- [ ] add "copy page as markdown" button so people can give it to their AI to iterate on (which includes the URL & customizations)
+- [x] add "copy page as markdown" button so people can give it to their AI to iterate on (which includes the URL & customizations)
+- [x] add share / copy URL button 
 
 ## Value flow scenarios
 
