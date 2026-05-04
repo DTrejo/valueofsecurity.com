@@ -188,6 +188,13 @@
         }
       }
 
+      async function copyTextToClipboard(text) {
+        if (typeof text !== 'string' || text.length === 0) return
+        if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText)
+          throw new Error('Clipboard API unavailable')
+        await navigator.clipboard.writeText(text)
+      }
+
       const initialFragmentParams = readFragmentParams()
       const companyPayload = await loadCompanyPayload(
         initialFragmentParams.company,
@@ -255,6 +262,70 @@
             <span class=${darkOptionClass}>
               <i class="fa-solid fa-moon"></i>
             </span>
+          </button>
+        `
+      }
+
+      function CopyUrlButton({ url, onCopyResult }) {
+        async function handleCopyUrl() {
+          try {
+            await copyTextToClipboard(url)
+            onCopyResult?.({ status: 'success', message: 'URL copied' })
+          } catch {
+            onCopyResult?.({
+              status: 'error',
+              message: 'Could not copy URL',
+            })
+          }
+        }
+
+        return html`
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm gap-2 normal-case"
+            onClick=${handleCopyUrl}
+            aria-label="Copy URL"
+            title="Copy URL"
+          >
+            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+            <span>Copy URL</span>
+          </button>
+        `
+      }
+
+      function CopyMarkdownButton({ onCopyResult }) {
+        async function handleCopyMarkdown() {
+          const pageText =
+            typeof window !== 'undefined' &&
+            typeof window.main?.textContent === 'string'
+              ? window.main.textContent
+              : typeof document !== 'undefined'
+                ? document.body?.textContent ?? ''
+                : ''
+          try {
+            await copyTextToClipboard(pageText.trim())
+            onCopyResult?.({
+              status: 'success',
+              message: 'Page markdown copied',
+            })
+          } catch {
+            onCopyResult?.({
+              status: 'error',
+              message: 'Could not copy markdown',
+            })
+          }
+        }
+
+        return html`
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm gap-2 normal-case"
+            onClick=${handleCopyMarkdown}
+            aria-label="Copy Markdown"
+            title="Copy Markdown"
+          >
+            <i class="fa-solid fa-clipboard"></i>
+            <span>Copy Markdown</span>
           </button>
         `
       }
@@ -391,10 +462,13 @@
           EBITDA_MAX,
         )
         const [theme, setTheme] = useState(LIGHT_THEME)
+        const [copyToast, setCopyToast] = useState(null)
         const isLightTheme = theme === LIGHT_THEME
         const isLocalhost =
           typeof window !== 'undefined' &&
           window.location.hostname === 'localhost'
+        const shareUrl =
+          typeof window !== 'undefined' ? window.location.href : ''
 
         async function handleCompanyChange(event) {
           const nextCompanySlug = getKnownCompanySlug(event.currentTarget.value)
@@ -428,18 +502,36 @@
           setTheme(nextTheme)
         }
 
+        function handleCopyResult(result) {
+          const status = result?.status === 'error' ? 'error' : 'success'
+          const message =
+            typeof result?.message === 'string' && result.message.trim().length > 0
+              ? result.message.trim()
+              : 'Copied'
+          const id = Date.now()
+          setCopyToast({ id, status, message })
+          if (typeof window === 'undefined') return
+          window.setTimeout(() => {
+            setCopyToast((currentToast) =>
+              currentToast?.id === id ? null : currentToast,
+            )
+          }, 2200)
+        }
+
         return html`
-          <main class="mx-auto my-8 max-w-[720px] px-4 font-sans">
+          <main id="main" class="mx-auto my-8 max-w-[720px] px-4 font-sans">
             <div class="mb-4 flex items-start justify-between gap-4">
               <h1 class="text-3xl font-semibold">
                 <a href="/" class="text-inherit no-underline hover:underline"
                   >What is the value of security?</a
                 >
               </h1>
-              <${ThemePicker}
-                isLightTheme=${isLightTheme}
-                onToggleTheme=${toggleTheme}
-              />
+              <div class="flex items-center gap-1">
+                <${ThemePicker}
+                  isLightTheme=${isLightTheme}
+                  onToggleTheme=${toggleTheme}
+                />
+              </div>
             </div>
             <p class="mb-4">
               The disciplines of growth, marketing, and sales are well known for
@@ -459,6 +551,13 @@
               fill out the parameters.
             </p>
             <div class="mb-4">
+              <div class="mb-2 flex items-center justify-end gap-1">
+                <${CopyUrlButton}
+                  url=${shareUrl}
+                  onCopyResult=${handleCopyResult}
+                />
+                <${CopyMarkdownButton} onCopyResult=${handleCopyResult} />
+              </div>
               <div>
                 <h2 class="mb-2 flex items-center gap-2 text-2xl font-semibold">
                   <${CompanyPicker}
@@ -525,6 +624,24 @@
             <p class="mb-4">
               TODO: table of contents that links to each scenario
             </p>
+            ${copyToast
+              ? html`
+                  <div class="toast toast-top toast-end z-50">
+                    <div
+                      class=${`alert ${copyToast.status === 'error'
+                        ? 'alert-error'
+                        : 'alert-success'}`}
+                    >
+                      <i
+                        class=${`fa-solid ${copyToast.status === 'error'
+                          ? 'fa-circle-xmark'
+                          : 'fa-circle-check'}`}
+                      ></i>
+                      <span>${copyToast.message}</span>
+                    </div>
+                  </div>
+                `
+              : null}
             ${isLocalhost
               ? html`
                   <section
