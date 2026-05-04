@@ -21,7 +21,7 @@
 ## Todos
 - [ ] good design for editable number + range component
 - [ ] use it to build scenario 1: member value based on revenue and complete business stoppage
-    figure out explainable code + display of equations in the UI.
+    figure out explainable code + display of equations in the UI. 
     e.g. each calculation gets a single function, so the fn body's equation can be displayed in the UI and variable names can be substituted with values.
     ideally uses template strings as well. may need to parse the JS, but, maybe not since the variable names will be easy to find+replace.
 - [ ] add WIP banner for remaining scenarios and titles in the ToC
@@ -49,14 +49,14 @@
 revenue
 ransom amount for complete business stoppage
 
-2. member data
+2. Member data
 number of members
 number of sensitive (confidential, restricted) fields per member (e.g. fintech preset, infra preset which means all industries: fintech + hipaa + government)
 fine per confidential, fine per restricted (is it different?)
 dark web sale value (PRN mostly?)
 bug bounty value
 
-3. vulnerabilities e.g. RCE 
+3. Vulnerabilities, such as root code execution (RCE)
 government fine
 dark web sale value
 bug bounty value

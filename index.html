@@ -40,12 +40,31 @@
       const EBITDA_STEP = 5
       const FRAGMENT_KEY_COMPANY = 'company'
       const FRAGMENT_KEY_EBITDA_MARGIN_PCT = 'ebitdaMarginPct'
+      const FRAGMENT_KEY_INDUSTRY = 'industry'
       const APP_FRAGMENT_KEYS = [
         FRAGMENT_KEY_COMPANY,
         FRAGMENT_KEY_EBITDA_MARGIN_PCT,
+        FRAGMENT_KEY_INDUSTRY,
       ]
       const DEFAULT_COMPANY_SLUG = 'chime'
       const DEFAULT_COMPANY_NAME = 'Chime'
+      const DEFAULT_INDUSTRY = 'general'
+      const COMPANY_DEFAULT_INDUSTRY = {
+        chime: 'finance',
+      }
+      const INDUSTRY_OPTIONS = [
+        { value: 'general', label: 'General' },
+        { value: 'finance', label: 'Finance' },
+        { value: 'healthcare', label: 'Healthcare' },
+        { value: 'utilities', label: 'Utilities' },
+        { value: 'government', label: 'Government' },
+        { value: 'logistics', label: 'Logistics' },
+        { value: 'manufacturing', label: 'Manufacturing' },
+        { value: 'retail', label: 'Retail' },
+      ]
+      const INDUSTRY_VALUES = new Set(
+        INDUSTRY_OPTIONS.map(({ value }) => value),
+      )
       const COMPANY_OPTIONS = (() => {
         const globalOptions = Array.isArray(globalThis.COMPANY_NAME_SLUG)
           ? globalThis.COMPANY_NAME_SLUG
@@ -122,6 +141,24 @@
         return DEFAULT_COMPANY_SLUG
       }
 
+      function normalizeIndustry(value) {
+        if (typeof value !== 'string') return ''
+        return value.trim().toLowerCase()
+      }
+
+      function getKnownIndustry(value) {
+        const normalizedIndustry = normalizeIndustry(value)
+        if (!normalizedIndustry) return DEFAULT_INDUSTRY
+        return INDUSTRY_VALUES.has(normalizedIndustry)
+          ? normalizedIndustry
+          : DEFAULT_INDUSTRY
+      }
+
+      function getDefaultIndustryForCompany(companySlug) {
+        const normalizedCompanySlug = getKnownCompanySlug(companySlug)
+        return getKnownIndustry(COMPANY_DEFAULT_INDUSTRY[normalizedCompanySlug])
+      }
+
       function parseOptionalNumber(value) {
         if (value === null || value === undefined || value === '') return null
         const parsedValue = Number(value)
@@ -147,7 +184,11 @@
 
       function readFragmentParams() {
         if (typeof window === 'undefined')
-          return { company: DEFAULT_COMPANY_SLUG, ebitdaMarginPct: null }
+          return {
+            company: DEFAULT_COMPANY_SLUG,
+            ebitdaMarginPct: null,
+            industry: getDefaultIndustryForCompany(DEFAULT_COMPANY_SLUG),
+          }
         const fragmentParams = readFragmentSearchParams()
         const activeParams = hasAppFragmentParams(fragmentParams)
           ? fragmentParams
@@ -158,7 +199,12 @@
         const ebitdaMarginPct = parseOptionalNumber(
           activeParams.get(FRAGMENT_KEY_EBITDA_MARGIN_PCT),
         )
-        return { company, ebitdaMarginPct }
+        const rawIndustry = activeParams.get(FRAGMENT_KEY_INDUSTRY)
+        const industry =
+          rawIndustry === null
+            ? getDefaultIndustryForCompany(company)
+            : getKnownIndustry(rawIndustry)
+        return { company, ebitdaMarginPct, industry }
       }
 
       function writeFragmentParams(nextParams, options = {}) {
@@ -169,9 +215,39 @@
           reset || !hasAppFragmentParams(currentFragmentParams)
             ? new URLSearchParams()
             : new URLSearchParams(currentFragmentParams)
+        let effectiveCompanySlug = getKnownCompanySlug(
+          fragmentParams.get(FRAGMENT_KEY_COMPANY),
+        )
+        if (
+          Object.prototype.hasOwnProperty.call(nextParams, FRAGMENT_KEY_COMPANY)
+        ) {
+          effectiveCompanySlug = getKnownCompanySlug(
+            nextParams[FRAGMENT_KEY_COMPANY],
+          )
+        }
         Object.entries(nextParams).forEach(([key, value]) => {
           if (value === null || value === undefined || value === '') {
             fragmentParams.delete(key)
+            return
+          }
+          if (key === FRAGMENT_KEY_COMPANY) {
+            const normalizedCompanySlug = getKnownCompanySlug(value)
+            if (normalizedCompanySlug === DEFAULT_COMPANY_SLUG) {
+              fragmentParams.delete(key)
+              return
+            }
+            fragmentParams.set(key, normalizedCompanySlug)
+            return
+          }
+          if (key === FRAGMENT_KEY_INDUSTRY) {
+            const normalizedIndustry = getKnownIndustry(value)
+            const defaultIndustry =
+              getDefaultIndustryForCompany(effectiveCompanySlug)
+            if (normalizedIndustry === defaultIndustry) {
+              fragmentParams.delete(key)
+              return
+            }
+            fragmentParams.set(key, normalizedIndustry)
             return
           }
           fragmentParams.set(key, String(value))
@@ -403,10 +479,48 @@
         `
       }
 
+      function IndustryPicker({ value, onChange, options = INDUSTRY_OPTIONS }) {
+        return html`
+          <fieldset class="mb-3">
+            <legend class="mb-2 text-sm font-medium text-gray-600">
+              Industry
+            </legend>
+            <div class="flex flex-wrap gap-2">
+              ${options.map(
+                ({ value: optionValue, label }) => html`
+                  <label
+                    key=${optionValue}
+                    class="cursor-pointer"
+                    title=${label}
+                    aria-label=${label}
+                  >
+                    <input
+                      type="radio"
+                      class="peer sr-only"
+                      name="industry"
+                      value=${optionValue}
+                      checked=${value === optionValue}
+                      onChange=${() => onChange(optionValue)}
+                    />
+                    <span
+                      class="inline-flex items-center rounded-full border border-base-content/20 px-3 py-1 text-sm transition peer-checked:border-base-content peer-checked:bg-base-content peer-checked:text-base-100"
+                      >${label}</span
+                    >
+                  </label>
+                `,
+              )}
+            </div>
+          </fieldset>
+        `
+      }
+
       function arrowBody(arrowFn) {
-        const needle = '=> '
+        const needle = '=>'
         const source = arrowFn.toString()
-        return source.slice(source.indexOf(needle) + needle.length)
+        return source
+          .slice(source.indexOf(needle) + needle.length)
+          .trim()
+          .replaceAll('\n', ' ')
       }
 
       function renderFormula(arrowFn) {
@@ -440,17 +554,19 @@
       }
 
       function ransomScenario({ industry = 'general', revenue }) {
-        // Base % by revenue band (inspired by your mapping doc)
-        let basePct
+        const normalizedIndustry = getKnownIndustry(industry)
+
+        // Base % by revenue band (inspired by mapping doc)
+        let baseByRevenueBandPct
         if (revenue > 5_000_000_000)
-          basePct = 0.007 // 0.7%
+          baseByRevenueBandPct = 0.007 // 0.7%
         else if (revenue >= 1_000_000_000)
-          basePct = 0.005 // 0.5%
+          baseByRevenueBandPct = 0.005 // 0.5%
         else if (revenue >= 250_000_000)
-          basePct = 0.0075 // 0.75%
+          baseByRevenueBandPct = 0.0075 // 0.75%
         else if (revenue >= 50_000_000)
-          basePct = 0.01 // 1.0%
-        else basePct = 0.015 // 1.5%
+          baseByRevenueBandPct = 0.01 // 1.0%
+        else baseByRevenueBandPct = 0.015 // 1.5%
 
         // Critical industries tend to face higher demands
         const industryMultiplier =
@@ -464,15 +580,22 @@
             retail: 0.95,
             general: 1.0,
           }[normalizedIndustry] ?? 1.0
-        const ransomValue = () => revenue * basePct * industryMultiplier
+        const ransomValue = () =>
+          revenue * baseByRevenueBandPct * industryMultiplier
         return {
           formula: renderFormula(ransomValue),
           ransomValue: ransomValue(),
+          baseByRevenueBandPct: baseByRevenueBandPct,
+          industryMultiplier: industryMultiplier,
           calculationLines: [
             renderFormula(ransomValue)
               .replaceAll('revenue', formatCurrency(revenue))
-              .replaceAll('basePct', formatPercent(basePct))
-              .replaceAll('industryMultiplier', industryMultiplier),
+              .replaceAll(
+                'baseByRevenueBandPct',
+                formatPercent(baseByRevenueBandPct),
+              )
+              .replaceAll('industryMultiplier', industryMultiplier)
+              .replaceAll(ransomValue.name, formatCurrency(ransomValue())),
           ],
         }
       }
@@ -518,6 +641,7 @@
         fragmentParams: initialFragmentParams = {
           company: DEFAULT_COMPANY_SLUG,
           ebitdaMarginPct: null,
+          industry: getDefaultIndustryForCompany(DEFAULT_COMPANY_SLUG),
         },
       }) {
         const [company, setCompany] = useState(initialCompany)
@@ -547,6 +671,14 @@
           : ['valuation', 'Valuation']
         const revenue = parseOptionalNumber(metrics.revenue)
         const memberValue = memberValueScenario(revenue)
+        const selectedIndustry = getKnownIndustry(fragmentParams.industry)
+        const ransom = ransomScenario({
+          industry: selectedIndustry,
+          revenue,
+        })
+        const selectedIndustryLabel =
+          INDUSTRY_OPTIONS.find(({ value }) => value === selectedIndustry)
+            ?.label ?? 'General'
         const metricTooltipCopy = {
           marketCap:
             'Current public market value of equity (share price × shares outstanding).',
@@ -595,6 +727,7 @@
           const nextFragmentParams = {
             company: nextCompanySlug,
             ebitdaMarginPct: null,
+            industry: getDefaultIndustryForCompany(nextCompanySlug),
           }
           setFragmentParams(nextFragmentParams)
           writeFragmentParams(nextFragmentParams, { reset: true })
@@ -609,6 +742,16 @@
           const nextFragmentParams = {
             ...fragmentParams,
             ebitdaMarginPct: boundedValue,
+          }
+          setFragmentParams(nextFragmentParams)
+          writeFragmentParams(nextFragmentParams)
+        }
+
+        function handleIndustryChange(nextIndustry) {
+          const normalizedIndustry = getKnownIndustry(nextIndustry)
+          const nextFragmentParams = {
+            ...fragmentParams,
+            industry: normalizedIndustry,
           }
           setFragmentParams(nextFragmentParams)
           writeFragmentParams(nextFragmentParams)
@@ -775,13 +918,28 @@
             <h3 class="mb-1 text-xl font-semibold">
               Ransom for business operation or all data
             </h3>
+            <${IndustryPicker}
+              value=${selectedIndustry}
+              onChange=${handleIndustryChange}
+            />
             <p class="mb-4">
               If hackers infiltrate your company, they may either encrypt all
               your data to halt operations, or exfiltrate sensitive data and
-              threaten to leak it. In the [default: general][finance][etc](this
-              is a radio input with the radios hidden and a selected state)
-              industry, [Read more](link to ransom-vs-revenue.md).
+              threaten to leak it. A ransom as percentage of revenue might
+              be<span> </span> ${ransom.baseByRevenueBandPct}, with a
+              <span> </span>${selectedIndustryLabel}<span> </span>
+              multiplier of ${ransom.industryMultiplier}, for an estimated
+              demand of ${formatCurrency(ransom.ransomValue)}.
+              <a
+                class="link ml-1"
+                href="https://github.com/DTrejo/valueofsecurity.com/blob/main/docs/value-mappings/ransom-vs-revenue.md"
+                >Details</a
+              >.
             </p>
+            <${CalculatorSummary}
+              formula=${ransom.formula}
+              lines=${ransom.calculationLines}
+            />
             ${copyToast
               ? html`
                   <div class="toast toast-top toast-end z-50">
