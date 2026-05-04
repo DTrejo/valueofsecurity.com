@@ -300,7 +300,7 @@
             typeof window.main?.textContent === 'string'
               ? window.main.textContent
               : typeof document !== 'undefined'
-                ? document.body?.textContent ?? ''
+                ? (document.body?.textContent ?? '')
                 : ''
           try {
             await copyTextToClipboard(pageText.trim())
@@ -505,7 +505,8 @@
         function handleCopyResult(result) {
           const status = result?.status === 'error' ? 'error' : 'success'
           const message =
-            typeof result?.message === 'string' && result.message.trim().length > 0
+            typeof result?.message === 'string' &&
+            result.message.trim().length > 0
               ? result.message.trim()
               : 'Copied'
           const id = Date.now()
@@ -537,7 +538,7 @@
               The disciplines of growth, marketing, and sales are well known for
               their focus on how they can improve revenue. Security tends to be
               much less quantified and more difficult to value quantitatively.
-              This mini-site aims to helps with that, and we won't shy away from
+              This minisite aims to helps with that, and we won't shy away from
               qualitative value either.
             </p>
             <p class="mb-4">
@@ -545,10 +546,9 @@
               play with implications for your business.
             </p>
             <p class="mb-4 italic">
-              Data does not leave your browser. Customizations are kept
-              client-side only in the URL fragment, so you can share your
-              customizations with others if you choose, or let your AI help you
-              fill out the parameters.
+              Data does not leave your browser. Customizations are client-side
+              only in the URL fragment, so you can share with others if you
+              choose, or let your AI help you fill out the parameters.
             </p>
             <div class="mb-4">
               <div class="mb-2 flex items-center justify-end gap-1">
@@ -628,14 +628,18 @@
               ? html`
                   <div class="toast toast-top toast-end z-50">
                     <div
-                      class=${`alert ${copyToast.status === 'error'
-                        ? 'alert-error'
-                        : 'alert-success'}`}
+                      class=${`alert ${
+                        copyToast.status === 'error'
+                          ? 'alert-error'
+                          : 'alert-success'
+                      }`}
                     >
                       <i
-                        class=${`fa-solid ${copyToast.status === 'error'
-                          ? 'fa-circle-xmark'
-                          : 'fa-circle-check'}`}
+                        class=${`fa-solid ${
+                          copyToast.status === 'error'
+                            ? 'fa-circle-xmark'
+                            : 'fa-circle-check'
+                        }`}
                       ></i>
                       <span>${copyToast.message}</span>
                     </div>
