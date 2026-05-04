@@ -373,11 +373,11 @@
 
         return html`
           <div
-            class="flex w-full min-w-0 items-center justify-end gap-2 sm:gap-3"
+            class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:gap-3"
           >
             <input
               type="range"
-              class="range range-xs [--range-fill:0] min-w-0 flex-1 sm:max-w-40"
+              class="range range-xs [--range-fill:0] w-full min-w-0 sm:max-w-40"
               min=${resolvedMin}
               max=${resolvedMax}
               step=${step}
@@ -387,9 +387,9 @@
             />
             <input
               type="number"
-              class="input input-ghost input-sm shrink-0 rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 px-0 text-lg text-right tabular-nums"
+              class="shrink-0 rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 bg-transparent px-0 text-lg text-right tabular-nums [appearance:textfield] outline-none focus:outline-none focus:ring-0"
               style=${{
-                width: `calc(${inputWidth} + 1ch)`,
+                width: inputWidth,
                 fontVariantNumeric: 'tabular-nums',
               }}
               min=${resolvedMin}
