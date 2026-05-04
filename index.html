@@ -439,6 +439,44 @@
         }
       }
 
+      function ransomScenario({ industry = 'general', revenue }) {
+        // Base % by revenue band (inspired by your mapping doc)
+        let basePct
+        if (revenue > 5_000_000_000)
+          basePct = 0.007 // 0.7%
+        else if (revenue >= 1_000_000_000)
+          basePct = 0.005 // 0.5%
+        else if (revenue >= 250_000_000)
+          basePct = 0.0075 // 0.75%
+        else if (revenue >= 50_000_000)
+          basePct = 0.01 // 1.0%
+        else basePct = 0.015 // 1.5%
+
+        // Critical industries tend to face higher demands
+        const industryMultiplier =
+          {
+            healthcare: 1.35,
+            finance: 1.3,
+            utilities: 1.25,
+            government: 1.2,
+            logistics: 1.15,
+            manufacturing: 1.0,
+            retail: 0.95,
+            general: 1.0,
+          }[normalizedIndustry] ?? 1.0
+        const ransomValue = () => revenue * basePct * industryMultiplier
+        return {
+          formula: renderFormula(ransomValue),
+          ransomValue: ransomValue(),
+          calculationLines: [
+            renderFormula(ransomValue)
+              .replaceAll('revenue', formatCurrency(revenue))
+              .replaceAll('basePct', formatPercent(basePct))
+              .replaceAll('industryMultiplier', industryMultiplier),
+          ],
+        }
+      }
+
       function CalculatorSummary({ formula, lines }) {
         const [isExpanded, setIsExpanded] = useState(false)
         return html`
@@ -734,14 +772,16 @@
               formula=${memberValue.formula}
               lines=${memberValue.calculationLines}
             />
-            <!--
             <h3 class="mb-1 text-xl font-semibold">
-              Ransom for the whole business
+              Ransom for business operation or all data
             </h3>
             <p class="mb-4">
-              ransom amount for complete business stoppage based on revenue
+              If hackers infiltrate your company, they may either encrypt all
+              your data to halt operations, or exfiltrate sensitive data and
+              threaten to leak it. In the [default: general][finance][etc](this
+              is a radio input with the radios hidden and a selected state)
+              industry, [Read more](link to ransom-vs-revenue.md).
             </p>
-            -->
             ${copyToast
               ? html`
                   <div class="toast toast-top toast-end z-50">
