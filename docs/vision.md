@@ -61,7 +61,7 @@ government fine
 dark web sale value
 bug bounty value
 
-4. government consent order (repeated security issues)
+4. Government consent order (repeated security issues)
 Continuing cost to business per year
 
 5. emotional / brand value
