@@ -38,6 +38,12 @@
       const EBITDA_MIN = -40
       const EBITDA_MAX = 40
       const EBITDA_STEP = 5
+      const FRAGMENT_KEY_COMPANY = 'company'
+      const FRAGMENT_KEY_EBITDA_MARGIN_PCT = 'ebitdaMarginPct'
+      const APP_FRAGMENT_KEYS = [
+        FRAGMENT_KEY_COMPANY,
+        FRAGMENT_KEY_EBITDA_MARGIN_PCT,
+      ]
       const DEFAULT_COMPANY_SLUG = 'chime'
       const DEFAULT_COMPANY_NAME = 'Chime'
       const COMPANY_OPTIONS = (() => {
@@ -121,32 +127,51 @@
         return Math.min(max, Math.max(min, value))
       }
 
-      function readUrlParams() {
+      function readFragmentSearchParams() {
+        if (typeof window === 'undefined') return new URLSearchParams()
+        const rawHash = window.location.hash.startsWith('#')
+          ? window.location.hash.slice(1)
+          : window.location.hash
+        return new URLSearchParams(rawHash)
+      }
+
+      function hasAppFragmentParams(fragmentParams) {
+        return APP_FRAGMENT_KEYS.some((key) => fragmentParams.has(key))
+      }
+
+      function readFragmentParams() {
         if (typeof window === 'undefined')
           return { company: DEFAULT_COMPANY_SLUG, ebitdaMarginPct: null }
-        const searchParams = new URLSearchParams(window.location.search)
-        const company = getKnownCompanySlug(searchParams.get('company'))
+        const fragmentParams = readFragmentSearchParams()
+        const activeParams = hasAppFragmentParams(fragmentParams)
+          ? fragmentParams
+          : new URLSearchParams()
+        const company = getKnownCompanySlug(
+          activeParams.get(FRAGMENT_KEY_COMPANY),
+        )
         const ebitdaMarginPct = parseOptionalNumber(
-          searchParams.get('ebitdaMarginPct'),
+          activeParams.get(FRAGMENT_KEY_EBITDA_MARGIN_PCT),
         )
         return { company, ebitdaMarginPct }
       }
 
-      function writeUrlParams(nextParams, options = {}) {
+      function writeFragmentParams(nextParams, options = {}) {
         if (typeof window === 'undefined') return
         const { reset = false } = options
-        const searchParams = reset
-          ? new URLSearchParams()
-          : new URLSearchParams(window.location.search)
+        const currentFragmentParams = readFragmentSearchParams()
+        const fragmentParams =
+          reset || !hasAppFragmentParams(currentFragmentParams)
+            ? new URLSearchParams()
+            : new URLSearchParams(currentFragmentParams)
         Object.entries(nextParams).forEach(([key, value]) => {
           if (value === null || value === undefined || value === '') {
-            searchParams.delete(key)
+            fragmentParams.delete(key)
             return
           }
-          searchParams.set(key, String(value))
+          fragmentParams.set(key, String(value))
         })
-        const nextSearch = searchParams.toString()
-        const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ''}${window.location.hash}`
+        const nextHash = fragmentParams.toString()
+        const nextUrl = `${window.location.pathname}${nextHash ? `#${nextHash}` : ''}`
         window.history.replaceState({}, '', nextUrl)
       }
 
@@ -163,8 +188,10 @@
         }
       }
 
-      const initialUrlParams = readUrlParams()
-      const companyPayload = await loadCompanyPayload(initialUrlParams.company)
+      const initialFragmentParams = readFragmentParams()
+      const companyPayload = await loadCompanyPayload(
+        initialFragmentParams.company,
+      )
 
       function CompanyPicker({
         options = [],
@@ -290,15 +317,17 @@
 
       export function App({
         company: initialCompany = {},
-        urlParams: initialUrlParams = {
+        fragmentParams: initialFragmentParams = {
           company: DEFAULT_COMPANY_SLUG,
           ebitdaMarginPct: null,
         },
       }) {
         const [company, setCompany] = useState(initialCompany)
-        const [urlParams, setUrlParams] = useState(initialUrlParams)
+        const [fragmentParams, setFragmentParams] = useState(
+          initialFragmentParams,
+        )
         const [isLoadingCompany, setIsLoadingCompany] = useState(false)
-        const selectedCompanySlug = getKnownCompanySlug(urlParams.company)
+        const selectedCompanySlug = getKnownCompanySlug(fragmentParams.company)
         const ticker = company.ticker ?? null
         const normalizedTicker = typeof ticker === 'string' ? ticker.trim() : ''
         const hasKnownTicker =
@@ -338,15 +367,17 @@
           ['employeeCount', 'Employee Count'],
         ]
         const sourceEbitdaMargin = parseOptionalNumber(metrics.ebitdaMarginPct)
-        const parsedUrlEbitdaMargin = parseOptionalNumber(
-          urlParams.ebitdaMarginPct,
+        const parsedFragmentEbitdaMargin = parseOptionalNumber(
+          fragmentParams.ebitdaMarginPct,
         )
-        const hasEditedEbitdaMargin = Number.isFinite(parsedUrlEbitdaMargin)
+        const hasEditedEbitdaMargin = Number.isFinite(parsedFragmentEbitdaMargin)
         const baseEbitdaMargin = Number.isFinite(sourceEbitdaMargin)
           ? sourceEbitdaMargin
           : 0
         const ebitdaMarginValue = clampNumber(
-          hasEditedEbitdaMargin ? parsedUrlEbitdaMargin : baseEbitdaMargin,
+          hasEditedEbitdaMargin
+            ? parsedFragmentEbitdaMargin
+            : baseEbitdaMargin,
           EBITDA_MIN,
           EBITDA_MAX,
         )
@@ -355,12 +386,12 @@
 
         async function handleCompanyChange(event) {
           const nextCompanySlug = getKnownCompanySlug(event.currentTarget.value)
-          const nextUrlParams = {
+          const nextFragmentParams = {
             company: nextCompanySlug,
             ebitdaMarginPct: null,
           }
-          setUrlParams(nextUrlParams)
-          writeUrlParams(nextUrlParams, { reset: true })
+          setFragmentParams(nextFragmentParams)
+          writeFragmentParams(nextFragmentParams, { reset: true })
           setIsLoadingCompany(true)
           const nextCompany = await loadCompanyPayload(nextCompanySlug)
           setCompany(nextCompany)
@@ -369,9 +400,12 @@
 
         function handleEbitdaMarginChange(nextValue) {
           const boundedValue = clampNumber(nextValue, EBITDA_MIN, EBITDA_MAX)
-          const nextUrlParams = { ...urlParams, ebitdaMarginPct: boundedValue }
-          setUrlParams(nextUrlParams)
-          writeUrlParams(nextUrlParams)
+          const nextFragmentParams = {
+            ...fragmentParams,
+            ebitdaMarginPct: boundedValue,
+          }
+          setFragmentParams(nextFragmentParams)
+          writeFragmentParams(nextFragmentParams)
         }
 
         function toggleTheme() {
@@ -404,11 +438,13 @@
             </p>
             <p class="mb-4">
               Try picking a company preset, or enter in your own situation and
-              play with implications for your business. Data does not leave your
-              browser. TODO: store all params in URL fragment. Your
-              customizations will be kept client-side only in the URL fragment,
-              so you can share your customizations with others if you choose, or
-              let your AI help you fill out the parameters.
+              play with implications for your business.
+            </p>
+            <p class="mb-4 italic">
+              Data does not leave your browser. Customizations are kept
+              client-side only in the URL fragment, so you can share your
+              customizations with others if you choose, or let your AI help you
+              fill out the parameters.
             </p>
             <div class="mb-4">
               <div>
@@ -483,13 +519,13 @@
 
       export const appProps = {
         company: companyPayload,
-        urlParams: initialUrlParams,
+        fragmentParams: initialFragmentParams,
       }
 
       export function renderApp() {
         return html`<${App}
           company=${appProps.company}
-          urlParams=${appProps.urlParams}
+          fragmentParams=${appProps.fragmentParams}
         />`
       }
 
