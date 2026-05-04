@@ -276,6 +276,11 @@
           ? max
           : safeValue + (Number.isFinite(maxOffset) ? maxOffset : 100)
         const boundedValue = clampNumber(safeValue, resolvedMin, resolvedMax)
+        const longestInputValueLength = Math.max(
+          String(resolvedMin).length,
+          String(resolvedMax).length,
+        )
+        const inputMinWidthClass = `min-w-[${longestInputValueLength}ch]`
 
         function handleRangeInput(event) {
           const nextValue = parseOptionalNumber(event.currentTarget.value)
@@ -293,7 +298,7 @@
           <div class="flex items-center justify-end gap-3">
             <input
               type="range"
-              class="range range-xs w-40"
+              class="range range-xs [--range-fill:0] w-40"
               min=${resolvedMin}
               max=${resolvedMax}
               step=${step}
@@ -303,7 +308,11 @@
             />
             <input
               type="number"
-              class="input input-ghost input-sm w-20 rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 px-0 text-lg text-right tabular-nums"
+              class=${`input input-ghost input-sm w-fit ${inputMinWidthClass} rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 px-0 text-lg text-right tabular-nums`}
+              style=${{
+                fieldSizing: 'content',
+                fontVariantNumeric: 'tabular-nums',
+              }}
               min=${resolvedMin}
               max=${resolvedMax}
               step=${step}
@@ -370,19 +379,22 @@
         const parsedFragmentEbitdaMargin = parseOptionalNumber(
           fragmentParams.ebitdaMarginPct,
         )
-        const hasEditedEbitdaMargin = Number.isFinite(parsedFragmentEbitdaMargin)
+        const hasEditedEbitdaMargin = Number.isFinite(
+          parsedFragmentEbitdaMargin,
+        )
         const baseEbitdaMargin = Number.isFinite(sourceEbitdaMargin)
           ? sourceEbitdaMargin
           : 0
         const ebitdaMarginValue = clampNumber(
-          hasEditedEbitdaMargin
-            ? parsedFragmentEbitdaMargin
-            : baseEbitdaMargin,
+          hasEditedEbitdaMargin ? parsedFragmentEbitdaMargin : baseEbitdaMargin,
           EBITDA_MIN,
           EBITDA_MAX,
         )
         const [theme, setTheme] = useState(LIGHT_THEME)
         const isLightTheme = theme === LIGHT_THEME
+        const isLocalhost =
+          typeof window !== 'undefined' &&
+          window.location.hostname === 'localhost'
 
         async function handleCompanyChange(event) {
           const nextCompanySlug = getKnownCompanySlug(event.currentTarget.value)
@@ -513,6 +525,20 @@
             <p class="mb-4">
               TODO: table of contents that links to each scenario
             </p>
+            ${isLocalhost
+              ? html`
+                  <section
+                    class="mt-10 border-t border-dotted border-base-content/40 pt-5"
+                  >
+                    <h2 class="mb-4 text-xl font-semibold">
+                      Storybook (localhost only)
+                    </h2>
+                    <p class="text-sm text-base-content/70">
+                      Nothing here for now.
+                    </p>
+                  </section>
+                `
+              : null}
           </main>
         `
       }
