@@ -82,6 +82,13 @@
         currency: 'USD',
         maximumFractionDigits: 0,
       })
+      const compactCurrencyFormatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        notation: 'compact',
+        compactDisplay: 'short',
+        maximumFractionDigits: 3,
+      })
       const percentFormatter = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -90,13 +97,12 @@
         maximumFractionDigits: 0,
       })
 
-      function formatValue(key, value) {
-        if (value === null || value === undefined) return 'N/A'
-        if (key === 'revenue' || key === 'marketCap' || key === 'valuation')
-          return currencyFormatter.format(value)
-        if (key.endsWith('Pct')) return `${percentFormatter.format(value)}%`
-        return numberFormatter.format(value)
-      }
+      const formatCurrency = (value) =>
+        Math.abs(value) >= 1_000_000
+          ? compactCurrencyFormatter.format(value)
+          : currencyFormatter.format(value)
+
+      const formatPercent = (value) => `${percentFormatter.format(value)}%`
 
       function getBaseUrl() {
         return typeof document === 'undefined' ? 'http://localhost:3000' : ''
@@ -366,10 +372,12 @@
         }
 
         return html`
-          <div class="flex items-center justify-end gap-3">
+          <div
+            class="flex w-full min-w-0 items-center justify-end gap-2 sm:gap-3"
+          >
             <input
               type="range"
-              class="range range-xs [--range-fill:0] w-40"
+              class="range range-xs [--range-fill:0] min-w-0 flex-1 sm:max-w-40"
               min=${resolvedMin}
               max=${resolvedMax}
               step=${step}
@@ -379,9 +387,9 @@
             />
             <input
               type="number"
-              class="input input-ghost input-sm rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 px-0 text-lg text-right tabular-nums"
+              class="input input-ghost input-sm shrink-0 rounded-none border-x-0 border-t-0 border-b-2 border-dotted border-base-content/50 px-0 text-lg text-right tabular-nums"
               style=${{
-                width: inputWidth,
+                width: `calc(${inputWidth} + 1ch)`,
                 fontVariantNumeric: 'tabular-nums',
               }}
               min=${resolvedMin}
@@ -391,6 +399,78 @@
               onChange=${handleNumberChange}
               aria-label="EBITDA margin input"
             />
+          </div>
+        `
+      }
+
+      function arrowBody(arrowFn) {
+        const needle = '=> '
+        const source = arrowFn.toString()
+        return source.slice(source.indexOf(needle) + needle.length)
+      }
+
+      function renderFormula(arrowFn) {
+        return `${arrowFn.name} = ${arrowBody(arrowFn)}`
+      }
+
+      function memberValueScenario(revenue) {
+        const memberValueMin = (revenue) => revenue * 3
+        const memberValueMax = (revenue) => revenue * 20
+        const memberValueMinValue = memberValueMin(revenue)
+        const memberValueMaxValue = memberValueMax(revenue)
+        return {
+          formula: 'memberValue = revenue × [3, 20]',
+          memberValueMin: memberValueMinValue,
+          memberValueMax: memberValueMaxValue,
+          calculationLines: [
+            renderFormula(memberValueMin)
+              .replaceAll('revenue', formatCurrency(revenue))
+              .replaceAll(
+                memberValueMin.name,
+                formatCurrency(memberValueMinValue),
+              ),
+            renderFormula(memberValueMax)
+              .replaceAll('revenue', formatCurrency(revenue))
+              .replaceAll(
+                memberValueMax.name,
+                formatCurrency(memberValueMaxValue),
+              ),
+          ],
+        }
+      }
+
+      function CalculatorSummary({ formula, lines }) {
+        const [isExpanded, setIsExpanded] = useState(false)
+        return html`
+          <div class="mb-4">
+            <button
+              type="button"
+              class="btn btn-ghost btn-xs gap-1 px-1"
+              onClick=${() => setIsExpanded((expanded) => !expanded)}
+              aria-expanded=${isExpanded}
+              aria-label="Toggle formula details"
+              title="Toggle formula details"
+            >
+              <i class="fa-solid fa-calculator"></i>
+              <span>Show calculation</span>
+            </button>
+            ${isExpanded
+              ? html`
+                  <div
+                    class="mt-2 rounded border border-base-content/20 bg-base-100/60 p-3 text-sm"
+                  >
+                    <p>
+                      <code>${formula}</code>
+                    </p>
+                    <ul class="mt-2 list-disc pl-5">
+                      ${lines.map(
+                        (line) =>
+                          html`<li key=${line} class="mb-1">${line}</li>`,
+                      )}
+                    </ul>
+                  </div>
+                `
+              : null}
           </div>
         `
       }
@@ -427,6 +507,8 @@
         const companyValueMetric = isPublicCompany
           ? ['marketCap', 'Market Cap']
           : ['valuation', 'Valuation']
+        const revenue = parseOptionalNumber(metrics.revenue)
+        const memberValue = memberValueScenario(revenue)
         const metricTooltipCopy = {
           marketCap:
             'Current public market value of equity (share price × shares outstanding).',
@@ -520,7 +602,10 @@
         }
 
         return html`
-          <main id="main" class="mx-auto my-8 max-w-[720px] px-4 font-sans">
+          <main
+            id="main"
+            class="mx-auto my-8 box-border max-w-[720px] px-1 font-sans"
+          >
             <div class="mb-4 flex items-start justify-between gap-4">
               <h1 class="text-3xl font-semibold">
                 <a href="/" class="text-inherit no-underline hover:underline"
@@ -536,13 +621,12 @@
             </div>
             <p class="mb-4">
               The disciplines of growth, marketing, and sales are well known for
-              their focus on how they can improve revenue. Security tends to be
-              much less quantified and more difficult to value quantitatively.
-              This minisite aims to helps with that, and we won't shy away from
-              qualitative value either.
+              their focus on revenue. Security tends to be much more difficult
+              to value quantitatively. This minisite aims to help with that, and
+              we won't shy away from illuminating qualitative value either.
             </p>
             <p class="mb-4">
-              Try picking a company preset, or enter in your own situation and
+              Try picking a company preset, or enter in your own metrics and
               play with implications for your business.
             </p>
             <p class="mb-4 italic">
@@ -589,8 +673,20 @@
                 </tr>
               </thead>
               <tbody>
-                ${orderedMetrics.map(
-                  ([key, label]) => html`
+                ${orderedMetrics.map(([key, label]) => {
+                  const metricValue = metrics[key]
+                  const formattedMetricValue =
+                    metricValue === null || metricValue === undefined
+                      ? 'N/A'
+                      : key === 'revenue' ||
+                          key === 'marketCap' ||
+                          key === 'valuation'
+                        ? formatCurrency(metricValue)
+                        : key.endsWith('Pct')
+                          ? formatPercent(metricValue)
+                          : numberFormatter.format(metricValue)
+
+                  return html`
                     <tr key=${key}>
                       <td class="border-b border-gray-100 py-2">
                         <span
@@ -614,22 +710,37 @@
                               step=${EBITDA_STEP}
                               onChange=${handleEbitdaMarginChange}
                             />`
-                          : formatValue(key, metrics[key])}
+                          : formattedMetricValue}
                       </td>
                     </tr>
-                  `,
-                )}
+                  `
+                })}
               </tbody>
             </table>
             <p class="mb-4">
               TODO: table of contents that links to each scenario
             </p>
-            <h2>Security Value Flows</h2>
-            <h2>Member Value</h2>
-            <p>Let's assume member value is 3x-20x revenue.</p>
+            <h2 class="mb-2 mt-6 text-2xl font-semibold">
+              Security Value Flows
+            </h2>
+            <h3 class="mb-1 text-xl font-semibold">Member Value</h3>
+            <p class="mb-4">
+              Let's assume member value is 3x-20x revenue, or<span> </span>
+              ${formatCurrency(memberValue.memberValueMin)}-${formatCurrency(
+                memberValue.memberValueMax,
+              )}.
+            </p>
+            <${CalculatorSummary}
+              formula=${memberValue.formula}
+              lines=${memberValue.calculationLines}
+            />
             <!--
-            <h2>Ransom for the whole business</h2>
-            ransom amount for complete business stoppage based on revenue
+            <h3 class="mb-1 text-xl font-semibold">
+              Ransom for the whole business
+            </h3>
+            <p class="mb-4">
+              ransom amount for complete business stoppage based on revenue
+            </p>
             -->
             ${copyToast
               ? html`
