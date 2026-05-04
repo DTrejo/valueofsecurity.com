@@ -18,6 +18,28 @@
 -  1. Clearly lay out the data we need to collect  
 -  2. Create a set of examples ala engineerworth which flow from the data (plain text only for now)  
 
+## Todos
+- [ ] good design for editable number + range component
+- [ ] use it to build scenario 1: member value based on revenue and complete business stoppage
+- [ ] add WIP banner for remaining scenarios and titles in the ToC
+
+- [x] move all URL params into fragment params.
+- [x] buy valueofsecurity.com
+- [x] add CNAME for above
+- [x] create github repo
+- [x] deploy site to gh-pages
+- [x] set up cloudflare DNS for gh-pages
+- = ^_^ MVP ^_^ =
+- [ ] devise easily-customized tag-based calculation strategy for more complex calculations
+- [ ] figure out explainable code + display of equations in the UI. 
+    e.g. each calculation gets a single function, so the fn body's equation can be displayed in the UI and variable names can be substituted with values.
+    ideally uses template strings as well. may need to parse the JS, but, maybe not since the variable names will be easy to find+replace.
+- [ ] do the rest of the scenarios. try and prompt them from the markdown files and based on the first simple example.
+- [ ] write announcement message for linkedin+etc
+- [ ] Generate social image
+- [ ] Announce on linkedin+etc
+- [ ] add "copy page as markdown" button so people can give it to their AI to iterate on (which includes the URL & customizations)
+
 ## Value flow scenarios
 
 1. member value == 3-20x revenue
@@ -58,6 +80,8 @@ opportunity:
     $ value of risk reduction as result of a project
     loss exceedance curve
     risk tolerance curve
+    Value of information
+    Applied information economics
 
 8. cyber insurance
 Annual cost
