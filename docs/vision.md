@@ -21,8 +21,10 @@
 ## Todos
 - [ ] good design for editable number + range component
 - [ ] use it to build scenario 1: member value based on revenue and complete business stoppage
+    figure out explainable code + display of equations in the UI.
+    e.g. each calculation gets a single function, so the fn body's equation can be displayed in the UI and variable names can be substituted with values.
+    ideally uses template strings as well. may need to parse the JS, but, maybe not since the variable names will be easy to find+replace.
 - [ ] add WIP banner for remaining scenarios and titles in the ToC
-
 - [x] move all URL params into fragment params.
 - [x] buy valueofsecurity.com
 - [x] add CNAME for above
