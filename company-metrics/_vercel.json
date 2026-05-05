@@ -1,0 +1,16 @@
+{
+  "companyName": "Vercel",
+  "ticker": null,
+  "fiscalYear": "Mar 2026",
+  "sourceFile": null,
+  "extractedAt": "2026-04-27T19:51:28.026Z",
+  "metrics": {
+    "revenue": 340000000,
+    "revenueGrowthPct": 86.0,
+    "grossMarginPct": 76.0,
+    "marketCap": null,
+    "valuation": 9300000000,
+    "ebitdaMarginPct": null,
+    "employeeCount": 926
+  }
+}
